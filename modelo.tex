@@ -1,0 +1,52 @@
+\documentclass{article}
+
+\usepackage[width=14cm, left=3cm, top=3cm]{geometry}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+
+\usepackage{minted}
+
+\newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
+\newcommand{\nobody}{ninguém}
+\newcommand{\preamble}[2]{\noindent%
+    Fiz esse trabalho com a ajuda de {\bfseries #1}
+    e consultei {\bfseries #2}.
+    A versão final do trabalho foi feita
+    por mim de forma independente.
+    \par\noindent Assinatura: \blank\blank\bigskip}
+
+\newcounter{exe-list}
+\newenvironment{exe-list}
+    {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
+    {\end{list}}
+
+\newenvironment{exe}[1]
+    {\newcommand{\opt}{(Opcional)}%
+    \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
+    \medskip\par\noindent\textbf{\large Problema~#1}%
+    \medskip\par\noindent}
+    {\medskip}
+
+\newcommand{\DeclareBps}[2]{\DeclareMathOperator{#1}{#2{}bps}}
+\DeclareBps{\bps}{}
+\DeclareBps{\kbps}{k}
+\DeclareBps{\Mbps}{M}
+\DeclareBps{\Gbps}{G}
+
+\title{Redes de Computadores - Lista X}
+\author{Daniel Kiyoshi Hashimoto Vouzella de Andrade - 119025937}
+\date{Mês 2022}
+
+\begin{document}
+\maketitle
+
+\preamble{\blank}{\blank}
+
+\end{document}
