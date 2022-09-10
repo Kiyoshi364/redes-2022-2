@@ -11,7 +11,8 @@
 
 \usepackage{multicol}
 
-\usepackage{minted}
+\usepackage{ifthen}
+%\usepackage{minted}
 
 \newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
 \newcommand{\nobody}{ninguém}
@@ -27,10 +28,12 @@
     {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
     {\end{list}}
 
-\newenvironment{exe}[1]
+\newenvironment{exe}[2][Problema]
     {\newcommand{\opt}{(Opcional)}%
     \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
-    \medskip\par\noindent\textbf{\large Problema~#1}%
+    \medskip\par\noindent\ifthenelse{\equal{#1}{}}
+        {\textbf{\large #2}}
+        {\textbf{\large #1~#2}}%
     \medskip\par\noindent}
     {\medskip}
 
