@@ -1,0 +1,397 @@
+\documentclass{article}
+
+\usepackage[width=14cm, left=3cm, top=3cm]{geometry}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+
+\usepackage{hyperref}
+
+\usepackage{ifthen}
+%\usepackage{minted}
+
+\newcommand{\To}{\Longrightarrow}
+
+\newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
+\newcommand{\nobody}{ninguém}
+\newcommand{\preamble}[2]{\noindent%
+    Fiz esse trabalho com a ajuda de {\bfseries #1}
+    e consultei {\bfseries #2}.
+    A versão final do trabalho foi feita
+    por mim de forma independente.
+    \par\noindent Assinatura: \blank\blank\bigskip}
+
+\newcounter{exe-list}
+\newenvironment{exe-list}
+    {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
+    {\end{list}}
+
+\newenvironment{exe}[2][Problema]
+    {\newcommand{\opt}{(Opcional)}%
+    \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
+    \medskip\par\noindent\ifthenelse{\equal{#1}{}}
+        {\textbf{\large #2}}
+        {\textbf{\large #1~#2}}%
+    \medskip\par\noindent}
+    {\medskip}
+
+\newcommand{\Declare}[3]{\DeclareMathOperator{#1}{#2{}#3}}
+\newcommand{\DeclareBit}[2]{\Declare{#1}{#2}{b}}
+\DeclareBit{\bit}{}
+\DeclareBit{\kbit}{k}
+\DeclareBit{\Mbit}{M}
+\DeclareBit{\Gbit}{G}
+\newcommand{\DeclareByte}[2]{\Declare{#1}{#2}{byte}}
+\DeclareByte{\byte}{}
+\DeclareByte{\kbyte}{k}
+\DeclareByte{\Mbyte}{M}
+\DeclareByte{\Gbyte}{G}
+\newcommand{\DeclareBps}[2]{\Declare{#1}{#2}{bps}}
+\DeclareBps{\bps}{}
+\DeclareBps{\kbps}{k}
+\DeclareBps{\Mbps}{M}
+\DeclareBps{\Gbps}{G}
+
+\title{Redes de Computadores - Lista 1 (parte 2)}
+\author{Daniel Kiyoshi Hashimoto Vouzella de Andrade - 119025937}
+\date{Setembro 2022}
+
+\begin{document}
+\maketitle
+
+\preamble{\nobody}{\nobody}
+
+\begin{exe}{12}
+    \begin{itemize}
+    \item Tempo para um pacote ser transmitido:
+        \( \frac{L}{R}
+            = \frac{1500 \byte}{2 \Mbps}
+            = \frac{1500 \cdot 2^8}{2 \cdot 1000000}
+            = 0.192 \)
+        \item Tempo para esvaziar a fila (queue delay):
+        \( 4.5 \cdot .0192 = 0.864 \)
+    \item Bits para transmitir (genérico):
+        \( L \; n + x \)
+    \item Queue delay (genérico):
+        \( \frac{L \; n + x}{R} \)
+    \end{itemize}
+\end{exe}
+
+\begin{exe}{13}
+    \begin{exe-list}
+    \item \begin{itemize}
+            \item Queue delay para o pacote \(i\)
+                (contando a partir do \(0\)):
+                \( i \; \frac{L}{R} \)
+            \item Média do queue delay:
+                \[
+                    \frac1N \sum_{i = 0}^{N-1} i \; \frac{L}{R}
+                    = \frac{L}{N \; R} \sum_{i = 0}^{N-1} i
+                    = \frac{L}{N \; R} \; \frac{N \; (N-1)}{2}
+                    = \frac{L \; (N-1)}{R}
+                \]
+        \end{itemize}
+    \item \begin{itemize}
+            \item Tempo para a fila esvaziar:
+                \( N \; \frac{L}{R} \)
+            \item A fila fica vazia na próxima chegada,
+                então o tempo médio é o mesmo da questão anterior:
+                \( \frac{L \; (N-1)}{R} \)
+        \end{itemize}
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{14}
+    \begin{exe-list}
+    \item \begin{itemize}
+            \item Total delay (\( d_{queue} + d_{trans} \)):
+                \[
+                    \frac{I \; L}{(1 - I) \; R} + \frac{L}{R}
+                    = \frac{L}{R} \; \left(
+                            \frac{I}{1 - I} + 1
+                        \right)
+                    = \frac{L}{R} \; \left(
+                            \frac{I + 1 - I}{1 - I}
+                        \right)
+                    = \frac{L}{R} \; \frac{1}{1 - I}
+                    = \frac{L}{R \; (1 - I)}
+                \]
+            \item Substituindo (\( I = \frac{L \; a}{R} \)):
+                \[
+                    \frac{L}{R \; (1 - \frac{L \; a}{R})}
+                    = \frac{L}{R - L \; a}
+                \]
+        \end{itemize}
+    \item \begin{itemize}
+            \item Troca de variáveis \( x := \frac{L}{R} \):
+                \[
+                    \frac{L}{R \; (1 - \frac{L \; a}{R})}
+                    = \frac{L}{R} \; \frac{1}{1 - \frac{L \; a}{R}}
+                    = x \; \frac{1}{1 - a \; x}
+                    = \frac{x}{1 - a \; x}
+                \]
+            \item \textit{Lembrete:} \(a \; x < 1\)
+            \item \textit{Lembrete:} o eixo y representa o delay
+            \item Não me sinto confortável imbutindo uma imagem,
+                então um link: \par
+                \href{https://www.desmos.com/calculator/n7ug34enga}
+                {desmos.com/calculator/n7ug34enga}
+            \item O gráfico faz sentido, intuitivamente:
+            \begin{itemize}
+                \item Quanto maior o tamanho do pacote
+                    em relação à taxa de transmissão
+                    (\(x := \frac{L}{R}\)),
+                    maior o tempo de espera.
+                \item É ``linear'' quando
+                    a taxa de chegada de pacotes (\(a\))
+                    é muito próxima de 0;
+                    é como se só chegasse um pacote por vez,
+                    então o delay é só enviar o pacote.
+                \item Explode ``exponencialmente'' quando
+                    a taxa de chegada é muito grande;
+                    é como se chegasse mais pacotes do que
+                    o sistema pode aguentar,
+                    gerando uma fila de espera gigantesca.
+            \end{itemize}
+        \end{itemize}
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{15}
+    \begin{itemize}
+        \item \(x\) são quantos segundos demora
+            para enviar um pacote,
+            então \( \frac1x \) são
+            quantos pacotes são enviados por segundo
+        \item Usando \(\mu := \frac{1}{x} \):
+            \[
+                \frac{x}{1 - a \; x}
+                = \frac{\frac{x}{x}}{\frac1x - \frac{a \; x}{x}}
+                = \frac{1}{\frac1x - a}
+                = \frac{1}{\mu - a}
+            \]
+    \end{itemize}
+\end{exe}
+
+\begin{exe}{20}
+    \begin{itemize}
+        \item Assumindo que os \(M\) clientes-servidores estão
+            usando a rede simultâneamente,
+            a taxa de transmissão do ``bottleneck'':
+            \( \frac{R}{M} \)
+        \item Throughput percebido por cada cliente-servidor:
+            \( \min\left( R_s, R_c, \frac{R}{M} \right) \)
+    \end{itemize}
+\end{exe}
+
+\begin{exe}{21}
+    \begin{itemize}
+        \item Assumindo que só pode usar um caminho,
+            mais especificamente o caminho \( 1 \le k \le M \):
+            \[
+                \min\left(
+                    R_{(1,k)}, R_{(2,k)}, \dots,
+                    R_{(N-1,k)}, R_{(N,k)} \right)
+            \]
+        \item Assumindo que pode usar todos os caminhos.
+        \begin{itemize}
+            \item Definindo \( T_k \) como o throughput
+                do caminho \(k\),
+                obtido no item anterior:
+                \[
+                    T_k := \min\left(
+                        R_{(1,k)}, R_{(2,k)}, \dots,
+                        R_{(N-1,k)}, R_{(N,k)} \right)
+                \]
+            \item Throughput total:
+                \( \sum_{k = 1}^M T_k \)
+        \end{itemize}
+    \end{itemize}
+\end{exe}
+
+\begin{exe}[]{Multipath TCP}
+    Parece ser uma implementação do conceito levantado
+    na última questão:
+    aproveitar os vários caminhos
+    para alcançar um throuput melhor.
+    Este funciona na camada de transporte.
+\end{exe}
+
+\begin{exe}{22 \opt}
+    \begin{itemize}
+        \item Para o pacote chegar no destino,
+            precisamos de \(N\) ``falhas'',
+            ou seja, \(N\) pacotes \textbf{NÃO} perdidos:
+            \( (1-p)^N \)
+        \item \( q := (1-p)^N \) é a probabilidade de sucesso.
+            Quantas vezes temos que tentar, na média,
+            para que tenhamos o sucesso?
+            Isso é a esperança de uma geométrica:
+            \[
+                \sum_{i = i}^{+\infty} (1-q)^i \; q
+                = \frac{1}{q}
+                = \frac{1}{(1-p)^N}
+                = (1-p)^{-N}
+            \]
+    \end{itemize}
+\end{exe}
+
+\begin{exe}{23}
+    \begin{exe-list}
+    \item A diferença dos tempos de chegada é
+        a diferença dos tempos de transmissão e propagação
+        do bobbleneck e do outro link:
+        \( \frac{L}{R_s} - \frac{L}{R_c} \)
+    \item \begin{itemize}
+            \item Não é possível,
+                pois o primeiro link será mais rápido que o segundo,
+                então o segundo pacote irá esperar o primeiro
+                que ainda estaria sendo transmitido pelo segundo link.
+            \item \(T\) deve ser no mínimo o tempo que
+                o segundo pacote espera no caso anterior:
+                \( \frac{L}{R_c} - \frac{L}{R_s} \)
+        \end{itemize}
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}[]{Packet Pairs}
+    Uma grande vantagem é não causar
+    um grande distúrbio na rede,
+    ou seja, ainda é possível usar a rede
+    enquanto o teste está sendo feito,
+    por outro lado a estratégia de \emph{Packet Pairs}
+    causa um disturbio consideravelmente menor.
+
+    A técnica funciona enviando dois pacotes semelhantes
+    com uma diferença de tempo muito pequena e
+    observando a diferença de tempo de chegada dos pacotes no destino.
+    Geralmente, quanto maior esse tempo (\emph{inter-time arrival})
+    maior o bottleneck,
+    mas existem alguns eventos que mascaram o bottleneck
+    (tanto para mais quanto para menos) e
+    foram desenvolvidas outras técnicas para filtrá-los.
+\end{exe}
+
+\begin{exe}{25}
+    \begin{exe-list}
+    \item \[
+            R \cdot d_{prop}
+            = 2 \Mbps \cdot \frac{2 \cdot 10^7}{2.5 \cdot 10^8}
+            = 2 \cdot 10^6 \cdot 0.08
+            = 0.16 \cdot 10^6
+            = 160000
+        \]
+    \item O número máximo de bits é o produto do item anterior
+        \( R \cdot d_{prop} = 160000 \)
+    \item Bandwidth-delay representa a quantidade máxima de bits
+        que podem ficar no link
+        (não está nem no inicio nem no destino,
+        está ``no meio do caminho'').
+
+        Esse número é importante para protocolos
+        com a característica de ``esperar uma resposta''
+        para enviar a ``próxima parte''.
+        Quando o produto é muito alto
+        comparado com o tamanho do pacote,
+        isso indica que um tempo considerável da rede
+        está ociosa (assumindo apenas essa conexão).
+        Dessa forma seria melhor mandar mais ``partes''
+        antes de ``esperar uma resposta''.
+    \item ``Cabem'' \( 160000 \) bits
+        no link de \( 2 \cdot 10^7 \) metros.
+        Então um bit ocupa
+        \( \frac{16 \cdot 10^4}{2 \cdot 10^7} = 8 \cdot 10^{-3} \)
+        metros, ou \( 8 \) milímeros.
+    \item \begin{itemize}
+            \item Bandwidth-delay product:
+                \( R \; \frac{m}{s} = \frac{R \; m}{s} \)
+            \item ``Tamanho'' do bit:
+                \( \frac{\frac{R \; m}{s}}{m} = \frac{R}{s} \)
+        \end{itemize}
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{31 \opt}
+    \begin{exe-list}
+    \item \begin{itemize}
+            \item Tempo para enviar para o primeiro switch:
+                \( \frac{8 \cdot 10^6}{2 \Mbps} = 4 \)
+            \item Tempo para enviar para o segundo switch (igual):
+                \( \frac{8 \cdot 10^6}{2 \Mbps} = 4 \)
+            \item Tempo para enviar para o destino (igual):
+                \( \frac{8 \cdot 10^6}{2 \Mbps} = 4 \)
+            \item Tempo total:
+                \( 3 \cdot 4 = 12 \)
+        \end{itemize}
+    \item \begin{itemize}
+            \item Tempo para enviar o primeiro pacote
+                para o primeiro switch:
+                \[
+                    \frac{10^4}{2 \Mbps} = 0.5 \cdot 10^{-2}
+                    = 0.005
+                \]
+            \item Tempo no qual o segundo pacote
+                é recebido pelo primeiro switch:
+                \( 2 \cdot 0.005 = 0.01 \)
+        \end{itemize}
+    \item \begin{itemize}
+            \item Tempo para enviar a mensagem toda:
+                \(
+                    0.005 \; (800 - 1 + 3)
+                    = 4 - 0.005 + 0.015
+                    = 4.01
+                \)
+            \item Esse resultado é da ordem de \(3\) vezes melhor,
+                pois todos os link (são 3)
+                estavam sendo usados, aproximadamente,
+                ao mesmo tempo.
+                Enquanto que, no item (a),
+                cada link foi usado um depois do outro.
+
+                Essa ideia (\emph{pipeline}) foi discutida em aula.
+        \end{itemize}
+    \item O tamanho das mensagens diminui,
+        aumentando a probabilidade dela caber no buffer
+        e não ser \emph{droppada}.
+        Também permite enviar pacotes por vários caminhos diferentes
+        (usando mais links ``ao mesmo tempo'');
+        isso, além de diminuir ainda mais o \emph{delay},
+        ajuda a reduzir a perda de pacotes.
+    \item Uma desvantagem é usar todos os links,
+        isso pode congestionar a rede e torná-la mais próxima
+        de uma circuit-switched para outras pessoas usando a rede
+        (quem envia os pacotes acaba ``reservando'' uma linha).
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{33 \opt}
+    \begin{itemize}
+        \item Tempo de um pacote em um link:
+            \( \frac{L}{R} = \frac{80 + S}{R} \)
+        \item Tempo total usando \( n = \frac{F}{S} \):
+            \[
+                \frac{L}{R} \; (n - 1 + 3)
+                = \frac{L}{R} \; (n + 2)
+                = \frac{80 + S}{R} \; (n + 2)
+                = \frac{80 \; n + 160 + S \; n + 2 \; S}{R}
+            \]
+        \item Substituindo \( n := \frac{F}{S} \):
+            \[
+                \frac{80 \; n + 160 + S \; n + 2 \; S}{R}
+                = \frac{80 \; \frac{F}{S} + 2 \cdot 80
+                    + S \; \frac{F}{S} + 2 \; S}{R}
+                = \frac{80 \; F + (160 + F) \; S
+                    + 2 \; S^2}{R \; S}
+            \]
+        \item \sketch{falta minimizar a função
+            para achar o melhor \(S\).}
+    \end{itemize}
+\end{exe}
+
+\end{document}
