@@ -1,6 +1,6 @@
 \documentclass{article}
 
-\usepackage[width=14cm, left=3cm, top=3cm]{geometry}
+\usepackage[width=14cm, left=3cm, top=2cm]{geometry}
 
 \usepackage[brazil]{babel}
 \usepackage[T1]{fontenc}
@@ -37,7 +37,18 @@
     \medskip\par\noindent}
     {\medskip}
 
-\newcommand{\DeclareBps}[2]{\DeclareMathOperator{#1}{#2{}bps}}
+\newcommand{\Declare}[3]{\DeclareMathOperator{#1}{#2{}#3}}
+\newcommand{\DeclareBit}[2]{\Declare{#1}{#2}{b}}
+\DeclareBit{\bit}{}
+\DeclareBit{\kbit}{k}
+\DeclareBit{\Mbit}{M}
+\DeclareBit{\Gbit}{G}
+\newcommand{\DeclareByte}[2]{\Declare{#1}{#2}{byte}}
+\DeclareByte{\byte}{}
+\DeclareByte{\kbyte}{k}
+\DeclareByte{\Mbyte}{M}
+\DeclareByte{\Gbyte}{G}
+\newcommand{\DeclareBps}[2]{\Declare{#1}{#2}{bps}}
 \DeclareBps{\bps}{}
 \DeclareBps{\kbps}{k}
 \DeclareBps{\Mbps}{M}
