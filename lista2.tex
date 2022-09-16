@@ -1,0 +1,146 @@
+\documentclass{article}
+
+\usepackage[width=14cm, left=3cm, top=2cm]{geometry}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+
+\usepackage{ifthen}
+%\usepackage{minted}
+
+\newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
+\newcommand{\nobody}{ninguém}
+\newcommand{\preamble}[2]{\noindent%
+    Fiz esse trabalho com a ajuda de {\bfseries #1}
+    e consultei {\bfseries #2}.
+    A versão final do trabalho foi feita
+    por mim de forma independente.
+    \par\noindent Assinatura: \blank\blank\bigskip}
+
+\newcounter{exe-list}
+\newenvironment{exe-list}
+    {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
+    {\end{list}}
+
+\newenvironment{exe}[2][Problema]
+    {\newcommand{\opt}{(Opcional)}%
+    \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
+    \medskip\par\noindent\ifthenelse{\equal{#1}{}}
+        {\textbf{\large #2}}
+        {\textbf{\large #1~#2}}%
+    \medskip\par\noindent}
+    {\medskip}
+
+\newcommand{\Declare}[3]{\DeclareMathOperator{#1}{#2{}#3}}
+\newcommand{\DeclareBit}[2]{\Declare{#1}{#2}{b}}
+\DeclareBit{\bit}{}
+\DeclareBit{\kbit}{k}
+\DeclareBit{\Mbit}{M}
+\DeclareBit{\Gbit}{G}
+\newcommand{\DeclareByte}[2]{\Declare{#1}{#2}{byte}}
+\DeclareByte{\byte}{}
+\DeclareByte{\kbyte}{k}
+\DeclareByte{\Mbyte}{M}
+\DeclareByte{\Gbyte}{G}
+\newcommand{\DeclareBps}[2]{\Declare{#1}{#2}{bps}}
+\DeclareBps{\bps}{}
+\DeclareBps{\kbps}{k}
+\DeclareBps{\Mbps}{M}
+\DeclareBps{\Gbps}{G}
+
+\title{Redes de Computadores - Lista 2}
+\author{Daniel Kiyoshi Hashimoto Vouzella de Andrade - 119025937}
+\date{Setembro 2022}
+
+\begin{document}
+\maketitle
+
+\preamble{\nobody}{\nobody}
+
+\begin{exe}[]{Pergunta 1}
+    \begin{itemize}
+        \item \textbf{Non-persistent HTTP:}
+            cada requisição precisa de uma conexão,
+            precisa de várias conexões para receber vários objetos.
+        \item \textbf{Persistent HTTP:}
+            em uma conexão pode ser feitos várias requisições,
+            isso remove overhead de criar uma conexão
+            quando se requer vários objetos.
+    \end{itemize}
+\end{exe}
+
+\begin{exe}[]{Pergunta 2}
+    \begin{itemize}
+        \item Os cookies servem para o servidor ``lembrar''
+            com quem está conversando.
+        \item HTTP é stateless. TCP é statefull.
+        \item Isso não está relacionado.
+            TCP ``simplesmente'' transporta bits de
+            um Host para outro Host,
+            e acaba usando estado para decidir
+            quando enviar mais ou menos dados.
+
+            O HTTP descreve um par requisição e resposta,
+            e esse par (a princípio) não tem nenhuma informação sobre
+            ``pares passados'', então é dito stateless.
+    \end{itemize}
+\end{exe}
+
+\begin{exe}[]{Pergunta 3}
+    Usa UDP,
+    pois tem que responder muitas mensagens
+    (todo mundo quer saber como chegar no www.sitelegal.com)
+    e perda de dados, ou a não garantia da resposta,
+    não é tão ruim, basta refazer o request.
+    (Na primeira vez, a busca pelo IP pode ser custoso,
+    mas nas próximas a resposta vai estar no cache,
+    então é acaba ficando de ``graça'')
+\end{exe}
+
+\begin{exe}[]{Pergunta 4}
+    A requesição recursiva é muito conveniente,
+    só precisa fazer uma requisição e
+    o servidor requisitado vai resolver o resto;
+    mas congestiona o servidor em questão,
+    pois todo mundo iria passar por esse servidor
+    para saber a resposta.
+
+    A requesição iterativa faz o cliente fazer as próximas buscas,
+    isso permite que o servidor fique menos ocupado
+    e ajuda a garantir que estará servindo por mais tempo.
+\end{exe}
+
+\begin{exe}[]{Pergunta 5}
+    Vantagens:
+    \begin{itemize}
+        \item Mais resistente:
+            Se o server cair, tudo cai.
+            Se um nó num p2p cai, o resto funciona.
+        \item Mais barato:
+            Manter um servidor ligado o tempo todo é caro.
+        \item Cresce com facilidade:
+            Qualquer um pode se comportar como ``servidor''.
+        \item Potencialmente mais rápida:
+            não precisa de intermediário (servidor) ou
+            pode se conseguir fragmentos de informação
+            por vários nós diferentes ao mesmo tempo.
+    \end{itemize}
+    Desvantagens:
+    \begin{itemize}
+        \item Segurança:
+            qualquer um pode ser um ``servidor'',
+            é difícil garantimos que um dado nó é confiável/seguro.
+        \item Inconsistência:
+            atualizar uma informação demora tempo,
+            já que a informação vai ter que passar por todos
+            os pontos.
+    \end{itemize}
+\end{exe}
+
+\end{document}
