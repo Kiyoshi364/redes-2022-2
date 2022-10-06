@@ -1,0 +1,142 @@
+\documentclass{article}
+
+\usepackage[width=14cm, left=3cm, top=2cm]{geometry}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+
+\usepackage{ifthen}
+%\usepackage{minted}
+
+\usepackage{hyperref}
+
+\newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
+\newcommand{\nobody}{ninguém}
+\newcommand{\preamble}[2]{\noindent%
+    Fiz esse trabalho com a ajuda de {\bfseries #1}
+    e consultei {\bfseries #2}.
+    A versão final do trabalho foi feita
+    por mim de forma independente.
+    \par\noindent Assinatura: \blank\blank\bigskip}
+
+\newcounter{exe-list}
+\newenvironment{exe-list}
+    {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
+    {\end{list}}
+
+\newenvironment{exe}[2][Problema]
+    {\newcommand{\opt}{(Opcional)}%
+    \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
+    \medskip\par\noindent\ifthenelse{\equal{#1}{}}
+        {\textbf{\large #2}}
+        {\textbf{\large #1~#2}}%
+    \medskip\par\noindent}
+    {\medskip}
+
+\title{Redes de Computadores - Lista Sockets}
+\author{Daniel Kiyoshi Hashimoto Vouzella de Andrade - 119025937}
+\date{Outubro 2022}
+
+\begin{document}
+\maketitle
+
+Os códigos estão em
+\href{https://github.com/Kiyoshi364/redes-2022-2/blob/main/sockets}
+{github.com/Kiyoshi364/redes-2022-2/blob/main/sockets}
+
+Os códigos originais (com mínimas alterações em \texttt{UDPClient.py})
+estão com \texttt{Original} no final do nome.
+\bigskip
+
+\begin{exe}{1}
+    Só foi necessário modificar o cliente.
+    Achei o enunciado meio ambíguio,
+    então tem um comentário explicando as possíveis
+    versões do que foi pedido.
+    A modificação está no arquivo \texttt{UDPClientMod.py}.
+\end{exe}
+
+\begin{exe}{2}
+    As implementações estão nos arquivos
+    \texttt{TCPClientSingle.py} e \texttt{TCPServerSingle.py}.
+
+    Genericamente, o não persistente é melhor quando
+    são enviadas poucas mensagens,
+    pois o overhead que se paga ao abrir e fechar uma conexão
+    é raramente pago.
+    Também é uma boa ideia quando há pouco tráfego,
+    pois não ``há diferença'' entre pagar ou não o overhead.
+
+    Por outro lado, o persistente é melhor quando
+    são trocadas várias mensagens,
+    pois não se paga o overhead de abrir e fechar uma conexão.
+
+    No caso específico do server singlethreaded e
+    múltiplos clients com várias requesições,
+    se os clients demoram muito para responder
+    o não persistente é mais justo,
+    pois permite que os outros clients tenham alguma
+    mensagem processada enquanto o client atual cria
+    o próximo processo.
+
+    Note: idealmente cada client iria criar a mensagem e
+    depois buscar a conexão,
+    mas nessa implementação o client cria a conexão imediatamente
+    e só a fecha quando o programa encerra.
+\end{exe}
+
+\begin{exe}{3}
+    As implementações estão nos arquivos
+    \texttt{UDPServerPar.py} e \texttt{TCPServerPar.py}.
+\end{exe}
+
+\begin{exe}{4}
+    As implementações estão nos arquivos
+    \begin{itemize}
+        \item \texttt{UDPServerListen.py}
+        \item \texttt{UDPClientNats.py}
+        \item \texttt{TCPServerListen.py}
+        \item \texttt{TCPClientNats.py}
+    \end{itemize}
+
+    Não observei nenhuma diferença
+    (desconsiderando que na versão TCP,
+    por ser uma mensagem longa tinha \verb.`\n'.
+    entre os números -- detalhe de implementação).
+
+    Uma possível diferênça é que, no caso do UDP,
+    não há garantia das ``mensagens'' chegarem na mesma ordem.
+    Como o teste foi feito em localhost,
+    parece razoável (em 5 testes) que nenhum deles
+    tenha sido desordenado.
+\end{exe}
+
+\begin{exe}{5}
+    As implementações estão nos arquivos
+    \texttt{TCPServerLogin.py} e \texttt{TCPClientLogin.py}.
+\end{exe}
+
+\begin{exe}{6}
+    As implementações estão nos arquivos
+    \texttt{TCPServerBot.py} e \texttt{TCPClientBot.py}.
+\end{exe}
+
+\begin{exe}{29}
+    TODO
+\end{exe}
+
+\begin{exe}{30}
+    TODO
+\end{exe}
+
+\begin{exe}{31}
+    TODO
+\end{exe}
+
+\end{document}
