@@ -128,15 +128,52 @@ estão com \texttt{Original} no final do nome.
 \end{exe}
 
 \begin{exe}{29}
-    TODO
+    Não é necessário alterar \texttt{UDPServer.py}.
+    Em ambos os casos a porta do Server é 12000,
+    mas do Client é *aleatório* e 5432,
+    respectivamente para antes e depois da mudança.
+
+    Chamar a função bind pode retornar erro
+    pois a porta escolhida já está sendo usada.
 \end{exe}
 
 \begin{exe}{30}
-    TODO
+    Eu não sei configurar o meu browser para fazer isso.
+    Teoricamente, é vantajoso pois permite receber
+    diversos arquivos ao mesmo tempo,
+    potencialmente de uma forma mais rápida.
+    Mas a quantidade extra de conexões pode
+    sobrecarregar a rede,
+    fazendo com o que a rede esteja saturada
+    e transmitindo uma quantidade indesejada de overhead.
 \end{exe}
 
 \begin{exe}{31}
-    TODO
+    Uma vantagem de uma API que preserva mensagens é
+    a não necessidade de estado para o receptor da mensagem,
+    ou seja, se um receptor crashar e
+    outro aparecer em seu lugar tudo continua funcionando
+    (permite que qualquer thread de uma pool,
+    receba e trate essa mensagem).
+
+    Uma vantagem da API que usa stream é que
+    ela é ``mais geral'',
+    no sentido de que ela não impõe nenhum overhead
+    como ``guardar o tamanho da mensagem'',
+    então dá mais liberdade para o usuário
+    da API ``montar o seu protocolo''.
+
+    A flag \verb.MSG_WAITALL. serve para indicar
+    ``eu só vou ler a mensagem quando eu receber x bytes''.
+    Então isso é ótimo quando a aplicação tem certeza
+    de quantos bytes vai precisar,
+    por exemplo,
+    quando for ler um cabeçalho
+    (que geralmente tem tamanho constante)
+    ou um corpo logo após dele
+    (o tamanho do corpo está na no cabeçalho).
+    O uso dessa flag evita um while
+    que espera ler os x bytes chegarem.
 \end{exe}
 
 \end{document}
