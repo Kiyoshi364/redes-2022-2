@@ -1,0 +1,343 @@
+\documentclass{article}
+
+\usepackage[width=14cm, left=3cm, top=2cm]{geometry}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+
+\usepackage{ifthen}
+%\usepackage{minted}
+
+\newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
+\newcommand{\nobody}{ninguém}
+\newcommand{\preamble}[2]{\noindent%
+    Fiz esse trabalho com a ajuda de {\bfseries #1}
+    e consultei {\bfseries #2}.
+    A versão final do trabalho foi feita
+    por mim de forma independente.
+    Respostas sem no mínimo 3 frases de justificativa
+    não contam ponto.
+    \par\noindent Assinatura: \blank\blank\bigskip}
+
+\newcounter{exe-list}
+\newenvironment{exe-list}
+    {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
+    {\end{list}}
+
+\newenvironment{exe}[2][Problema]
+    {\newcommand{\opt}{(Opcional)}%
+    \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
+    \medskip\par\noindent\ifthenelse{\equal{#1}{}}
+        {\textbf{\large #2}}
+        {\textbf{\large #1~#2}}%
+    \medskip\par\noindent}
+    {\medskip}
+
+\newcommand{\tab}[1]{\phantom{\hspace{#1}}}
+
+\DeclareMathOperator{\ms}{ms}
+
+\title{Redes de Computadores - Lista X}
+\author{Daniel Kiyoshi Hashimoto Vouzella de Andrade - 119025937}
+\date{Outubro 2022}
+
+\begin{document}
+\maketitle
+
+%\preamble{\blank}{\blank}
+
+\begin{exe}{31}
+    \begin{itemize}
+        \item \textbf{EstimatedRTT:}
+            \begin{align*}
+                EstimatedRTT_{i+1} &:= (1 - \alpha) \; EstimatedRTT_i
+                    + \alpha \; SampleRTT_{i+1} \\
+                EstimatedRTT_k &= 100 \ms \\
+                EstimatedRTT_{k+1} &= 0.875 \times 100 \ms
+                    + 0.125 \times 106 \ms \\
+                &= 100.75 \ms \\
+                EstimatedRTT_{k+2} &= 0.875 \times 100.75 \ms
+                    + 0.125 \times 120 \ms \\
+                &= 103.156 \ms \\
+                EstimatedRTT_{k+3} &= 0.875 \times 100.75 \ms
+                    + 0.125 \times 140 \ms \\
+                &= 107.762 \ms \\
+                EstimatedRTT_{k+4} &= 0.875 \times 100.75 \ms
+                    + 0.125 \times 90 \ms \\
+                &= 105.542 \ms \\
+                EstimatedRTT_{k+5} &= 0.875 \times 100.75 \ms
+                    + 0.125 \times 115 \ms \\
+                &= 106.724 \ms
+            \end{align*}
+        \item \textbf{DevRTT:}
+            \begin{align*}
+                DevRTT_{i+1} &:= (1 - \beta) \; DevRTT_i
+                    + \beta \; |SampleRTT_{i+1} - EstimatedRTT_{i+1}| \\
+                DevRTT_k &= 5 \\
+                DevRTT_{k+1} &= 0.75 \times 5 \ms
+                    + 0.25 \times |106 - 100| \ms \\
+                &= 5.25 \ms \\
+                DevRTT_{k+2} &= 0.75 \times 5.25 \ms
+                    + 0.25 \times |120 - 100.75| \ms \\
+                &= 8.75 \ms \\
+                DevRTT_{k+3} &= 0.75 \times 8.75 \ms
+                    + 0.25 \times |140 - 103.156| \ms \\
+                &= 15.7735 \ms \\
+                DevRTT_{k+4} &= 0.75 \times 15.7735 \ms
+                    + 0.25 \times |90 - 107.762| \ms \\
+                &= 16.2706 \ms \\
+                DevRTT_{k+5} &= 0.75 \times 16.2706 \ms
+                    + 0.25 \times |115 - 105.542| \ms \\
+                &= 14.5675 \ms
+            \end{align*}
+        \item \textbf{TimeoutInterval:}
+            \begin{align*}
+                TI_i &:= EstimatedRTT_i + 4 \; DevRTT_i \\
+                TI_k &= 100 + 4 \times 5 \\
+                &= 120 \ms \\
+                TI_{k+1} &= 100.75 + 4 \times 5.25 \\
+                &= 121.75 \ms \\
+                TI_{k+2} &= 103.156 + 4 \times 8.75 \\
+                &= 138.156 \ms \\
+                TI_{k+3} &= 107.762 + 4 \times 15.7735 \\
+                &= 170.856 \ms \\
+                TI_{k+4} &= 105.542 + 4 \times 16.2706 \\
+                &= 170.624 \ms \\
+                TI_{k+5} &= 106.724 + 4 \times 14.5675 \\
+                &= 164.994 \ms
+            \end{align*}
+    \end{itemize}
+\end{exe}
+
+\begin{exe}[Questão]{2}
+    \begin{exe-list}
+    \item
+        \begin{quote}
+            The Chebyshev Bound dictates that
+            the probability for a random value
+            exceeding a range around a mena
+            depends on the standard deviation.
+            Jacobson's Algorithm uses the Chebyshev Bound
+            to produce reasonable retransmition time-out (RTO) values.
+        \end{quote}
+        A primeira frase diz (algo mais geral) que
+        se temos a esperança e variância
+        dos round-trip times (RTT),
+        podemos saber quanto tempo o RTT vai demorar
+        para ser um evento com probabilidade menor que \(\varepsilon\)
+        (um número tão pequeno que ``nunca'' vai acontecer).
+        Exemplo: ``nunca'' vai acontecer de um RTT
+        demorar mais que \(3\) segundos.
+
+        A segunda disse que podemos usar isso
+        para criar uma boa estimativa de um RTO,
+        um tempo escolhido para o timeout.
+    \item
+        O algoritmo de Jacobson é rápido mas tem alguns problemas:
+        é pouco preciso;
+        RTO cresce muito rápido quando ocorre timeouts;
+        quando o pacote é perdido, fica muito tempo esperando;
+        e a variância é muito instável,
+        gerando grandes picos no RTO calculado.
+
+        A ideia é usar a mesma estrutura do algoritmo,
+        mas alterar a forma de previsão do RTT,
+        nesse caso usando Redes Neutrais.
+        E estimando melhor o RTT seria possível
+        detectar perdas mais cedo e
+        ao mesmo tempo
+        evitar o reenvio desnecessário de segmentos.
+
+        Usando dois modelos diferentes de Redes Neurais,
+        um se saiu consideravelmente melhor e
+        o outro foi levemente melhor,
+        no quesito quantidade de segmentos retransmitidos.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{37}
+    \begin{exe-list}
+    \item
+        Assumindo que nenhum pacote foi perdido
+        (além do enunciado),
+        sem corrupção e reordenação.
+        \begin{itemize}
+            \item \textbf{GBN:}
+                \begin{enumerate}
+                    \item A envia pacotes \(0 \dots 4\)
+                    \item Pacote \(1\) é perdido
+                    \item B recebe pacotes \(0, 2 \dots 4\),
+                        envia ACK \(0\), ignora os outros
+                    \item A recebe ACK \(0\)
+                    \item Timeout, A reenvia pacotes \(1 \dots 4\)
+                    \item B recebe pacotes \(1 \dots 4\),
+                        envia ACK \(1 \dots 4\)
+                \end{enumerate}
+            \item \textbf{SR:}
+                \begin{enumerate}
+                    \item A envia pacotes \(0 \dots 4\)
+                    \item Pacote \(1\) é perdido
+                    \item B recebe pacotes \(0, 2 \dots 4\),
+                        envia ACKs \(0, 2 \dots 4\)
+                    \item A recebe ACKs \(0, 2 \dots 4\)
+                    \item Timeout, A reenvia pacote \(1\)
+                    \item B recebe pacote \(1\),
+                        envia ACK \(1\)
+                \end{enumerate}
+            \item \textbf{TCP:}
+                \begin{enumerate}
+                    \item A envia pacotes \(0 \dots 4\)
+                    \item Pacote \(1\) é perdido
+                    \item B recebe pacotes \(0, 2 \dots 4\),
+                        envia ACK \(0\) para cada pacote recebido
+                        (total 4)
+                    \item A recebe 4 ACKs \(0\),
+                        reenvia pacote \(1\)
+                        (depois de receber o terceiro)
+                    \item B recebe pacote \(1\),
+                        envia ACK \(4\)
+                \end{enumerate}
+        \end{itemize}
+        Resumo:
+        {\par\centering\begin{tabular}{|l|c|c|c|c|}\hline
+            & \textbf{Pacotes enviados} & \textbf{Total (pacotes)}
+                & \textbf{ACKs enviados} & \textbf{Total (ACKs)}
+                \\\hline
+            \textbf{GBN} & 0,1,2,3,4,1,2,3,4 & 9 & 0,1,2,3,4 & 5
+                \\\hline
+            \textbf{SR}  & 0,1,2,3,4,1 & 6 & 0,2,3,4,1 & 5 \\\hline
+            \textbf{TCP} & 0,1,2,3,4,1 & 6 & 0,0,0,0,4 & 5 \\\hline
+        \end{tabular}\medskip}
+        Note que os ACKs no TCP ``de verdade'' deveriam ter sido
+        incrementados em 1 (pedindo o próximo byte),
+        mas deixei assim para ficar mais fácil de comparar
+        com os outros.
+    \item TCP, pois não precisou do timeout.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{40}
+    \begin{exe-list}
+    \item \([1, 5)\) e \([23, \_)\),
+        são os intervalos que têm um crescimento exponencial.
+    \item \([5, 22)\),
+        é o intervalo que tem um crescimento linear.
+    \item ACK triplicado, pois não voltou para o slow start.
+    \item Timeout, pois voltou para o slow start.
+    \item Um valor no intervalo \((16, 32]\),
+        pois é quando para de crescer exponencialmente.
+    \item \(\frac{42}{2} = 21\),
+        foi settado na ultima falha (em 16)
+    \item \(\frac{29}{2} = 14\),
+        pois o último falha ocorreu com o tamanho de janela
+        igual à 29.
+    \item Assumindo que não vai ter mais falhas
+        (ACKs triplicados e timeouts).
+        O slow start termina em
+        \(23 + \lceil \log_2 14 \rceil = 23 + 4 = 27\)
+        e a partir daí é incrementado em \(1\),
+        então o tamanho da janela vai ser
+        \(16 + (70 - 27) = 59\).
+    \item O tamanho da janela vai ser \(\frac82 + 3 = 7\) e
+        o thresh hold vai ser \(\frac82 = 4\).
+    \item O tamanho da janela vai ser \(2^{(19-16+1)} = 2^{2} = 4\) e
+        o thresh hold vai ser \(\frac{42}{2} = 21\).
+    \item \(1, 2, 4, 8, 16, 32\) nos rounds \(17\) até \(22\),
+        totalizando em \(63\).
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{45}
+    \begin{exe-list}
+    \item The loss rate são quantos segmentos são
+        perdidos dados que \(N\) foram enviados nesse período.
+        Nesse caso, são perdidos \(1\) segmento (no último envio)
+        no período de \(W - \frac{W}{2} = \frac{W}{2}\) RTT's.
+        \begin{itemize}
+            \item Em \(t_0 = \frac{W}{2}\) RTT,
+                enviamos \(\frac{W}{2}\) segmentos.
+            \item Em \(t_i = \frac{W}{2} + i\) RTT,
+                enviamos \(\frac{W}{2} + i\) segmentos,
+                com \(0 \le i \le \frac{W}{2}\)
+            \item Isso é uma P.A.:
+                \[
+                    \sum_{i = 0}^{\frac{W}{2}} \frac{W}{2} + i
+                    = \frac{(\frac{W}{2} + W) \; (\frac{W}{2} + 1)}{2}
+                    = \frac12 \; \left( \frac{3 \; W}{2} \; \frac{W + 2}{2} \right)
+                    = \frac18 \; \left( 3 \; W \; (W + 2) \right)
+                \] \[
+                    = \frac18 \; \left( 3 \; W^2 + 6 \; W \right)
+                    = \frac38 \; W^2 + \frac34 \; W
+                \]
+        \end{itemize}
+        Então \(L = \frac{1}{\frac38 \; W^2 + \frac34 \; W}\)
+    \item Usando \(Th = 0.75 \; \frac{W}{RTT}\):
+        \begin{align*}
+            L &= \frac{1}{\frac38 \; W^2 + \frac34 \; W}
+                \approx \frac{1}{\frac38 \; W^2} \\
+            \frac{1}{L} &\approx \frac38 \; W^2 \\
+            \frac{8}{3 \; L} &\approx W^2 \Longrightarrow
+                W \approx \frac{2 \; \sqrt{2}}{\sqrt{3} \; \sqrt{L}}
+        \end{align*}
+        \[
+            Th = \frac34 \; \frac{W}{RTT}
+            \approx \frac34 \; \frac{2 \; \sqrt{2}}{\sqrt{3} \; \sqrt{L}} \; \frac{MSS}{RTT}
+            \approx \sqrt{\frac32} \; \frac{1}{\sqrt{L}} \; \frac{MSS}{RTT}
+            \approx 1.22 \; \frac{MSS}{RTT \; \sqrt{L}}
+        \]
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{49}
+    A cada RTT, o tamanho da janela aumenta em \(1\),
+    dessa forma, precisamos incrementar \(\frac{W}{2}\)
+    \(W - \frac{W}{2} = \frac{W}{2}\) vezes.
+    Assim, \(T = \frac{W}{2}\) RTT.
+    Mas podemos escrever \(W\) em função de \(Th\):
+    \(T = \frac23 \; Th\) RTT.
+\end{exe}
+
+\begin{exe}{52}
+    Começando a janela com \(\frac{W}{2}\)
+    a cada RTT a nova janela vai ser \(w_{i-1} \; (1+a)\).
+    Dessa forma, no tempo \(t_i\) RTT sabemos que
+    \(w_i = \frac{W}{2} \; (1+a)^i\) e
+    no tempo \(t_T\) RTT,
+    \(w_T = \frac{W}{2} \; (1+a)^T = W\):
+    \begin{align*}
+        \frac{W}{2} \; (1+a)^T = W \\
+        (1+a)^T = 2 \\
+        \log_{1+a} (1+a)^T = \log_{1+a} 2 \\
+        T = \log_{1+a} 2 \\
+    \end{align*}
+    Então precisamos de \(\log_{1+a} 2\) RTT
+    para chegar na janela de \(W\).
+    Assumindo que \(\log_{1+a} 2\) é um número inteiro
+    (ou que a manipulação abaixo funciona),
+    a quantidade total de segmentos enviados é:
+    \begin{align*}
+        &\sum_{i = 0}^T \frac{W}{2} \; (1+a)^i \\
+        &\frac{W}{2} \; \sum_{i = 0}^T (1+a)^i \\
+        &\frac{W}{2} \; \left( \frac{(1+a)^T - 1}{(1 + a) - 1} \right) \\
+        &\frac{W}{2} \; \left( \frac{(1+a)^T - 1}{a} \right) \\
+        &\frac{W \; ((1+a)^T - 1)}{2 \; a} \\
+        &\frac{W \; ((1+a)^{\log_{1+a} 2} - 1)}{2 \; a} \\
+        &\frac{W \; (2 - 1)}{2 \; a} = \frac{W}{2 \; a} \\
+    \end{align*}
+    Então:
+    \[
+        L = \frac{1}{\frac{W}{2 \; a}}
+            = \frac{2 \; a}{W}
+    \]
+    O tempo \(T\) para a janela ir de \(\frac{W}{2}\) para \(W\)
+    não depende de \(W\), e assim,
+    não depende do \(Th\).
+\end{exe}
+
+\end{document}
