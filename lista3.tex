@@ -1,0 +1,689 @@
+\documentclass{article}
+
+\usepackage[width=14cm, left=3cm, top=2cm]{geometry}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+
+\usepackage{ifthen}
+%\usepackage{minted}
+
+\newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
+\newcommand{\nobody}{ninguém}
+\newcommand{\preamble}[2]{\noindent%
+    Fiz esse trabalho com a ajuda de {\bfseries #1}
+    e consultei {\bfseries #2}.
+    A versão final do trabalho foi feita
+    por mim de forma independente.
+    Respostas sem no mínimo 3 frases de justificativa
+    não contam ponto.
+    \par\noindent Assinatura: \blank\blank\bigskip}
+
+\newcounter{exe-list}
+\newenvironment{exe-list}
+    {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
+    {\end{list}}
+
+\newenvironment{exe}[2][Problema]
+    {\newcommand{\opt}{(Opcional)}%
+    \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
+    \medskip\par\noindent\ifthenelse{\equal{#1}{}}
+        {\textbf{\large #2}}
+        {\textbf{\large #1~#2}}%
+    \medskip\par\noindent}
+    {\medskip}
+
+\newcommand{\tab}[1]{\phantom{\hspace{#1}}}
+
+\DeclareMathOperator{\ms}{ms}
+
+\title{Redes de Computadores - Lista X}
+\author{Daniel Kiyoshi Hashimoto Vouzella de Andrade - 119025937}
+\date{Outubro 2022}
+
+\begin{document}
+\maketitle
+
+%\preamble{\blank}{\blank}
+
+\begin{exe}{6}
+    Uma maneira de chegar ao deadlock é:
+    \begin{enumerate}
+        \item Transmissor: envia pacote com seq=0
+        \item Receptor: recebe ok, envia ACK
+        \item Transmissor: recebe corrompido,
+            reenvia pacote com seq=0
+    \end{enumerate}
+    Agora estamos em um deadlock ``vivo'',
+    onde o Receptor sempre vai mandar NAK,
+    e o Transmissor sempre vai reenviar o pacote com seq=0.
+\end{exe}
+
+\begin{exe}{7}
+    O número de sequência serve apenas para dizer:
+    ``na minha sequência de blocos que
+    estou enviando para você
+    esse é o bloco número x''.
+    Isso é usado para garantir que o
+    receptor ``colecionou todas as figurinhas''.
+    Para o transmissor, não interessa saber
+    se ele recebeu todos os ACKs que o receptor enviou,
+    basta saber que o receptor recebeu todas as ``figurinhas''.
+
+    Mas ok, o transmissor recebeu
+    o ACK número 43 referente ao bloco número 43,
+    e então
+    o ACK número 46 referente ao bloco número 44.
+    Ele perdeu 2 ACKs, mas está confirmado que
+    foram recebidos os blocos 43 e 44,
+    o que o transmissor vai fazer com a informação extra
+    de que 2 ACKs foram perdidos?
+    Já existe um mecanismo para contornar a perda de pacotes:
+    o timeout.
+    Então o transmissor já sabia que provavelmente
+    o pacote foi perdido.
+
+    Uma outra possibilidade seria já ter acontecido o timeout
+    (nesse caso 2 timeouts),
+    mas chegou o ACK número 44 ao invés do 46 (do exemplo anterior),
+    ambos referentes ao bloco 44.
+    Talvez ainda chegue os ACKs 45 e 46,
+    mas o transmissor vai ignorá-los de qualquer maneira.
+    Imagino que a única coisa que o transmissor pode fazer
+    com essa informação é ajustar o tempo do timeout,
+    e isso não afeta na corretude do protocolo,
+    apenas na eficiência dele.
+\end{exe}
+
+\begin{exe}{11}
+    Sim para o \texttt{Wait for 1 from below},
+    considerando que o pacote na variável \texttt{sndpkt}
+    é o mesmo da última atribuição
+    (ACK, 0/1 e checksum não mudaram
+    desde a última vez que o pacote foi construído).
+    Uma consideração é que o primeiro pacote recebido
+    pode estar corrompido,
+    então caso \texttt{sndpkt} começasse inicializado
+    (com \texttt{make\_pkt(ACK, 1, checksum)})
+    ou fosse garantido o primeiro pacote não está corrompido
+    também funcionaria para \texttt{Wait for 0 from below}.
+
+    Se a auto-transição fosse removida,
+    no evento de um pacote corrompido,
+    o receptor não transmitiria nenhum pacote
+    para o transmissor,
+    mas o transmissor está aguardando um pacote
+    e o receptor também está aguardando um pacote:
+    o sistema entraria em deadlock.
+\end{exe}
+
+\begin{exe}{12}
+    No caso de reenviar o pacote
+    no evento de ACK errado ou pacote corrompido,
+    abriria a possibilidade do timer disparar
+    e reenviar uma segunda vez,
+    mesmo se for resetado no primeiro reenvio do pacote.
+    O receptor receberia 2 pacotes iguais e
+    responderia com 2 ACKs iguais.
+    O transmissor receberia o primeiro ACK e
+    enviaria o próximo pacote;
+    receberia o segundo ACK e reenviaria o mesmo pacote.
+    E agora está sendo transitido um mesmo bloco 2 vezes.
+    A cada timeout que não fosse correspondido por uma perda,
+    aumentaria em 1 na quantidade de blocos redundantes sendo
+    transmitido na rede.
+
+    O protocolo continuaria funcionando,
+    mas teria a possibilidade de um efeito indesejado:
+    pacotes redundantes voando na rede.
+\end{exe}
+
+\begin{exe}{13}
+    Pela dificuldade em desenhar num computador,
+    vou descrever a sequência de eventos e
+    possívelmente incluir uma foto do diagrama depois.
+
+    Notação:
+    \begin{itemize}
+        \item \(T\) é o transmissor
+        \item \(R\) é o receptor
+        \item \(D_ni\) é o pacote do bloco de dados \(n\),
+            o \(i\)-ésimo pacote enviado por \(T\).
+        \item \(A_ni\) é o pacote do ACK confirmando \(n\),
+            referente ao \(i\)-ésimo pacote enviado por \(T\).
+    \end{itemize}
+    \par\textit{Nota 1:
+        \(D_ni\) sempre vai do \(T\) para \(R\) e
+        \(A_ni\) sempre vai do \(R\) para \(T\).}
+    \par\textit{Nota 2:
+        \(i\) não aparece no protocolo/máquinas de estado,
+        por isso \(T\) e \(R\) não conseguem
+        distinguir pacotes com mesmo \(n\).}
+
+    \begin{multicols}{2}
+    \begin{enumerate}
+        \item Início: \(T\) envia \(D_00\)
+        \item Timeout: \(T\) envia \(D_01\)
+        \item Reordenação: \(R\) recebe \(D_01\), envia \(A_01\)
+            \par (Nota: \(D_00\) continua na rede)
+        \item Receive: \(T\) recebe \(A_01\), envia \(D_12\)
+        \item Reordenação: \(R\) recebe \(D_12\), envia \(A_12\)
+            \par (Nota: \(D_00\) continua na rede)
+        \item Receive: \(T\) recebe \(A_12\), envia \(D_03\)
+        \item Receive: \(R\) recebe \(D_00\), envia \(A_00\)
+            \par (Nota: \(D_03\) continua na rede)
+        \item Receive: \(R\) ignora \(D_03\), envia \(A_03\)
+        \item Receive: \(T\) recebe \(A_00\), envia \(D_14\)
+            \par (Nota: \(A_03\) continua na rede)
+        \item Receive: \(T\) recebe \(A_03\), ignora
+    \end{enumerate}
+    \end{multicols}
+    Note que o primeiro pacote \(D_00\) ficou
+    preso na rede por muito tempo e
+    no evento \(7.\) o receptor
+    confunde o pacote antigo \(D_00\)
+    com o que deveria ter sido recebido \(D_03\).
+    Quando o pacote correto chega no evento \(8.\),
+    o receptor apenas o ignora.
+    Nesse exemplo, o terceiro bloco recebido estava errado.
+    E nenhuma das partes conseguiu detectar isso.
+\end{exe}
+
+\begin{exe}{18}
+    Pela dificuldade em desenhar num computador,
+    vou descrever a sequência de eventos e
+    possívelmente incluir uma foto do diagrama depois.
+
+    Como só vão ter no máximo 2 blocos em transmisão,
+    o protocolo vai ser parecido com SR com N = 2.
+
+    As transições que começam com (*) são as transições iniciais
+    (no livro são as setas pontilhadas que vêm do além).
+    No final de cada ação pode ter um \texttt{goto(E)},
+    que diz: ``essa transição leva para o estado E''.
+    Se não tiver um \texttt{goto} no final da ação,
+    considere que é uma transição para o próprio estado.
+
+    Estados do Transmissor:
+    \begin{enumerate}
+        \item \texttt{Wait for 0 from above}:
+            \begin{itemize}
+                \item (*) \(\Lambda\) \par
+                    seqnum = 0 \\
+                    rcvedACK0 = false \\
+                    rcvedACK1 = false
+                \item \texttt{rdt\_send(data)} \par
+                    sndpkt[0]
+                        = make\_pkt(seqnum, 0, data) \\
+                    \texttt{goto(Wait for 1 from above)}
+                \item \texttt{rdt\_rcv(rcvpkt)} \par
+                    \(\Lambda\)
+            \end{itemize}
+        \item \texttt{Wait for 1 from above} \par
+            \begin{itemize}
+                \item \texttt{rdt\_send(data)} \par
+                    sndpkt[1]
+                        = make\_pkt(seqnum, 1, data) \\
+                    udt\_send(sndpkt[0]) \\
+                    udt\_send(sndpkt[1]) \\
+                    start\_timer \\
+                    \texttt{goto(Wait for ACKs)}
+                \item \texttt{rdt\_rcv(rcvpkt)} \par
+                    \(\Lambda\)
+            \end{itemize}
+        \item \texttt{Wait for ACKs} \par
+            \begin{itemize}
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& hasseqnum(rcvpkt, seqnum)
+                        \&\& isZero(rcvpkt \\\tab{4ex}
+                        \&\& !rcvedACK1} \par
+                    rcvedACK0 = true
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& hasseqnum(rcvpkt, seqnum)
+                        \&\& isZero(rcvpkt) \\\tab{4ex}
+                        \&\& rcvedACK1} \par
+                    seqnum++ \\
+                    rcvedACK1 = false \\
+                    stop\_timer \\
+                    \texttt{goto(Wait for 0 from above)}
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& hasseqnum(rcvpkt, seqnum)
+                        \&\& isOne(rcvpkt) \\\tab{4ex}
+                        \&\& !rcvedACK0} \par
+                    rcvedACK1 = true
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& hasseqnum(rcvpkt, seqnum)
+                        \&\& isOne(rcvpkt) \\\tab{4ex}
+                        \&\& rcvedACK0} \par
+                    seqnum++ \\
+                    rcvedACK0 = false \\
+                    stop\_timer \\
+                    \texttt{goto(Wait for 0 from above)}
+                \item \texttt{timeout} \par
+                    if ( !rcvedACK0 ) \\\tab{2ex}
+                        udt\_send(sndpkt[0]) \\
+                    if ( !rcvedACK1 ) \\\tab{2ex}
+                        udt\_send(sndpkt[1]) \\
+                    start\_timer
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& !hasseqnum(rcvpkt, seqnum)} \par
+                    \(\Lambda\)
+            \end{itemize}
+    \end{enumerate}
+
+    Estados do Receptor:
+    \begin{enumerate}
+        \item \texttt{Wait for 01 from below}:
+            \begin{itemize}
+                \item (*) \(\Lambda\) \par
+                    seqnum = 0
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& hasseqnum(rcvpkt, seqnum)
+                        \&\& isZero(rcvpkt)} \par
+                    extract(rcvpkt, data) \\
+                    deliver\_data(data) \\
+                    sndpkt = make\_pkt(seqnum, ACK, 0) \\
+                    udt\_send(sndpkt) \\
+                    \texttt{goto(Wait for 1 from below)}
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& hasseqnum(rcvpkt, seqnum)
+                        \&\& isOne(rcvpkt)} \par
+                    extract(rcvpkt, data) \\
+                    stred\_data = data \\
+                    sndpkt = make\_pkt(seqnum, ACK, 1) \\
+                    udt\_send(sndpkt) \\
+                    \texttt{goto(Wait for 0 from below)}
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& !hasseqnum(rcvpkt, seqnum)} \par
+                    parity = getparity(rcvpkt) \\
+                    sndpkt = make\_pkt(seqnum, ACK, parity) \\
+                    udt\_send(sndpkt)
+            \end{itemize}
+        \item \texttt{Wait for 0 from below}:
+            \begin{itemize}
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& isZero(rcvpkt)} \par
+                    extract(rcvpkt, data) \\
+                    deliver\_data(data) \\
+                    deliver\_data(stred\_data) \\
+                    sndpkt = make\_pkt(seqnum, ACK, 0) \\
+                    udt\_send(sndpkt) \\
+                    seqnum++ \\
+                    \texttt{goto(Wait for 01 from below)}
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& isOne(rcvpkt)} \par
+                    sndpkt = make\_pkt(seqnum, ACK, 1) \\
+                    udt\_send(sndpkt)
+            \end{itemize}
+        \item \texttt{Wait for 1 from below}:
+            \begin{itemize}
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& isOne(rcvpkt)} \par
+                    extract(rcvpkt, data) \\
+                    deliver\_data(data) \\
+                    sndpkt = make\_pkt(seqnum, ACK, 1) \\
+                    udt\_send(sndpkt) \\
+                    seqnum++ \\
+                    \texttt{goto(Wait for 01 from below)}
+                \item \texttt{rdt\_rcv(rcvpkt)
+                        \&\& isZero(rcvpkt)} \par
+                    sndpkt = make\_pkt(seqnum, ACK, 0) \\
+                    udt\_send(sndpkt)
+            \end{itemize}
+    \end{enumerate}
+
+    Descrição adicional do protocolo:
+    \begin{itemize}
+        \item Pacotes do transmissor para receptor contém:
+            um `seqnum'
+            (número com quantidade arbitrária de bits maior que 0),
+            `parity' (0 ou 1) e `data'.
+        \item Pacotes do receptor para transmissor contém:
+            um `seqnum'
+            (número com a mesma quantidade de bits do
+            que o `seqnum' do transmissor),
+            `ACK' (constante mágica que identifica um ACK) e
+            `parity' (0 ou 1).
+        \item Os procedimentos `getparity', `isZero' e `isOne'
+            interagem com `parity' do pacote, que respectivamente:
+            retorna o bit de paridade,
+            verifica que o bit de paridade é 0 e
+            verifica que o bit de paridade é 1.
+            Funcionam abstratamente para ambos os modelos de pacotes.
+        \item O \texttt{!} (exclamação) que precede um boolean
+            funciona como uma negação lógica
+            (igual a C e outras linguagens de programação).
+    \end{itemize}
+
+    Observações adicionais:
+    \begin{itemize}
+        \item No transmissor,
+            sería possível transformar `rcvedACK0' e `rcvedACK1'
+            em estados, mas teria muito copy-paste.
+            Achei que ia ficar menos legível.
+        \item Nos transmissor e receptor,
+            como não há reordenação de mensagens,
+            o `seqnum' poderia estar nos valores de 0 e 1,
+            e transformá-lo em estados simétricos,
+            assim como aparece nas FSM das versões 2.2 e 3.0.
+        \item No receptor,
+            no estado \texttt{Wait for 01 from below},
+            no evento de receber um pacote com paridade 1,
+            é necessário armazenar os dados do pacote
+            para que seja entregue em ordem para a camada de cima.
+            É equivalente armazenar o pacote inteiro
+            e depois (quando o 0 chegar)
+            extrair o dado e entregar o dado.
+        \item Para ``suportar'' corrupção,
+            basta adicionar um checksum e
+            droppar/ignorar mensagens corrompidas.
+        \item Já ``suporta'' reordenação,
+            desde que a quantidade de bits em `seqnum'
+            seja grande o suficiente.
+    \end{itemize}
+\end{exe}
+
+\begin{exe}{22}
+    \begin{exe-list}
+    \item
+        \begin{itemize}
+            \item \((k, k+1, k+2, k+3)\);
+            \item \((k-1, k, k+1, k+2)\),
+            \item \((k-2, k-1, k, k+1)\),
+            \item \((k-3, k-2, k-1, k)\),
+            \item \((k-4, k-3, k-2, k-1)\)
+        \end{itemize}
+        Esses são os casos em que o transmissor recebeu
+        \(k, k-1, k-2, k-3, k-4\) ACKs
+        (começando a contar do \(0\)), respectivamente.
+        Os ACKs que faltam estão em trânsito ou foram perdidos
+        (note que os ACKs são acumulativos,
+        então receber o ACK do \(k-1\) vale também como
+        ACK do \(k-2\)).
+
+        O receptor já recebeu todos os pacotes que vieram
+        antes do \(k\).
+
+        Os pacotes com número de sequência maior ou igual à \(k\)
+        já foram enviados pelo transmissor
+        ou ainda não existem
+        (o transmissor espera pela camada de cima).
+    \item
+        Considerando que o timeout só ocorre quando
+        um pacote que o transmissor envia é perdido,
+        os valores de ACK que podem estar à caminho
+        do transmissor são
+        maiores ou iguais ao menor número da sequência
+        (vamos chamar de \(x\))
+        e menores que \(k\).
+
+        Suponha que existe um valor de ACK menor que \(x\)
+        no ``meio do caminho'' para o transmissor,
+        o transmissor já confirmou esse pacote.
+        Então, ou isso é um ACK duplicado
+        (que nesse caso não conta porque eu pedi isso)
+        ou ele foi reordenado e outro ACK maior
+        chegou antes (confirmando o menor).
+        Logo, ou o ACK é maior ou igual a \(x\)
+        ou teve um ``timeout ruim''.
+
+        Suponha que existe um valor de ACK maior ou igual à \(k\)
+        no ``meio do caminho'' para o transmissor,
+        o receptor ainda está esperando esse pacote,
+        então ele não poderia ter enviado.
+        Logo, o valor de ACK tem que ser menor que \(k\).
+
+        Concluindo, o valor de ACK ``em trânsito''
+        está no intervalo de \([x, k)\) ou
+        é um ACK duplicado.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{24}
+    \begin{exe-list}
+    \item Sim, ele pode receber um ACK duplicado
+        ``mais antigo'' que a janela atual,
+        assumindo possibilidade de perda.
+    \item Sim, ele pode receber um ACK duplicado
+        ``mais antigo'' que a janela atual,
+        assumindo possibilidade de perda.
+        Mas também pode receber um ACK ``atrasado'',
+        assumindo possibilidade de reordenação.
+    \item Sim, GBN e SR são equivalentes quando a janela é 1.
+        Quando GBN tem janela 1,
+        ele tem um timer para cada pacote da janela.
+        Quando SR tem janela 1,
+        ele reenvia todos os pacotes quando ocorre um timeout.
+        (Veja item a baixo).
+    \item Sim, GBN envia todos os (1) pacotes e
+        espera algum ACK (o do pacote enviado)
+        chegar para avançar a janela
+        (liberar o próximo pacote).
+        Tem timeout.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{31}
+    \begin{itemize}
+        \item \textbf{EstimatedRTT:}
+            \begin{align*}
+                EstimatedRTT_{i+1} &:= (1 - \alpha) \; EstimatedRTT_i
+                    + \alpha \; SampleRTT_{i+1} \\
+                EstimatedRTT_k &= 100 \ms \\
+                EstimatedRTT_{k+1} &= 0.875 \times 100 \ms
+                    + 0.125 \times 106 \ms \\
+                &= 100.75 \ms \\
+                EstimatedRTT_{k+2} &= 0.875 \times 100.75 \ms
+                    + 0.125 \times 120 \ms \\
+                &= 103.156 \ms \\
+                EstimatedRTT_{k+3} &= 0.875 \times 100.75 \ms
+                    + 0.125 \times 140 \ms \\
+                &= 107.762 \ms \\
+                EstimatedRTT_{k+4} &= 0.875 \times 100.75 \ms
+                    + 0.125 \times 90 \ms \\
+                &= 105.542 \ms \\
+                EstimatedRTT_{k+5} &= 0.875 \times 100.75 \ms
+                    + 0.125 \times 115 \ms \\
+                &= 106.724 \ms
+            \end{align*}
+        \item \textbf{DevRTT:}
+            \begin{align*}
+                DevRTT_{i+1} &:= (1 - \beta) \; DevRTT_i
+                    + \beta \; |SampleRTT_{i+1} - EstimatedRTT_{i+1}| \\
+                DevRTT_k &= 5 \\
+                DevRTT_{k+1} &= 0.75 \times 5 \ms
+                    + 0.25 \times |106 - 100| \ms \\
+                &= 5.25 \ms \\
+                DevRTT_{k+2} &= 0.75 \times 5.25 \ms
+                    + 0.25 \times |120 - 100.75| \ms \\
+                &= 8.75 \ms \\
+                DevRTT_{k+3} &= 0.75 \times 8.75 \ms
+                    + 0.25 \times |140 - 103.156| \ms \\
+                &= 15.7735 \ms \\
+                DevRTT_{k+4} &= 0.75 \times 15.7735 \ms
+                    + 0.25 \times |90 - 107.762| \ms \\
+                &= 16.2706 \ms \\
+                DevRTT_{k+5} &= 0.75 \times 16.2706 \ms
+                    + 0.25 \times |115 - 105.542| \ms \\
+                &= 14.5675 \ms
+            \end{align*}
+        \item \textbf{TimeoutInterval:}
+            \begin{align*}
+                TI_i &:= EstimatedRTT_i + 4 \; DevRTT_i \\
+                TI_k &= 100 + 4 \times 5 \\
+                &= 120 \ms \\
+                TI_{k+1} &= 100.75 + 4 \times 5.25 \\
+                &= 121.75 \ms \\
+                TI_{k+2} &= 103.156 + 4 \times 8.75 \\
+                &= 138.156 \ms \\
+                TI_{k+3} &= 107.762 + 4 \times 15.7735 \\
+                &= 170.856 \ms \\
+                TI_{k+4} &= 105.542 + 4 \times 16.2706 \\
+                &= 170.624 \ms \\
+                TI_{k+5} &= 106.724 + 4 \times 14.5675 \\
+                &= 164.994 \ms
+            \end{align*}
+    \end{itemize}
+\end{exe}
+
+\begin{exe}[Questão]{10}
+    \begin{exe-list}
+    \item
+        \begin{quote}
+            The Chebyshev Bound dictates that
+            the probability for a random value
+            exceeding a range around a mena
+            depends on the standard deviation.
+            Jacobson's Algorithm uses the Chebyshev Bound
+            to produce reasonable retransmition time-out (RTO) values.
+        \end{quote}
+        A primeira frase diz (algo mais geral) que
+        se temos a esperança e variância
+        dos round-trip times (RTT),
+        podemos saber quanto tempo o RTT vai demorar
+        para ser um evento com probabilidade menor que \(\varepsilon\)
+        (um número tão pequeno que ``nunca'' vai acontecer).
+        Exemplo: ``nunca'' vai acontecer de um RTT
+        demorar mais que \(3\) segundos.
+
+        A segunda disse que podemos usar isso
+        para criar uma boa estimativa de um RTO,
+        um tempo escolhido para o timeout.
+    \item
+        O algoritmo de Jacobson é rápido mas tem alguns problemas:
+        é pouco preciso;
+        RTO cresce muito rápido quando ocorre timeouts;
+        quando o pacote é perdido, fica muito tempo esperando;
+        e a variância é muito instável,
+        gerando grandes picos no RTO calculado.
+
+        A ideia é usar a mesma estrutura do algoritmo,
+        mas alterar a forma de previsão do RTT,
+        nesse caso usando Redes Neutrais.
+        E estimando melhor o RTT seria possível
+        detectar perdas mais cedo e
+        ao mesmo tempo
+        evitar o reenvio desnecessário de segmentos.
+
+        Usando dois modelos diferentes de Redes Neurais,
+        um se saiu consideravelmente melhor e
+        o outro foi levemente melhor,
+        no quesito quantidade de segmentos retransmitidos.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{37}
+    \begin{exe-list}
+    \item
+        Assumindo que nenhum pacote foi perdido
+        (além do enunciado),
+        sem corrupção e reordenação.
+        \begin{itemize}
+            \item \textbf{GBN:}
+                \begin{enumerate}
+                    \item A envia pacotes \(0 \dots 4\)
+                    \item Pacote \(1\) é perdido
+                    \item B recebe pacotes \(0, 2 \dots 4\),
+                        envia ACK \(0\), ignora os outros
+                    \item A recebe ACK \(0\)
+                    \item Timeout, A reenvia pacotes \(1 \dots 4\)
+                    \item B recebe pacotes \(1 \dots 4\),
+                        envia ACK \(1 \dots 4\)
+                \end{enumerate}
+            \item \textbf{SR:}
+                \begin{enumerate}
+                    \item A envia pacotes \(0 \dots 4\)
+                    \item Pacote \(1\) é perdido
+                    \item B recebe pacotes \(0, 2 \dots 4\),
+                        envia ACKs \(0, 2 \dots 4\)
+                    \item A recebe ACKs \(0, 2 \dots 4\)
+                    \item Timeout, A reenvia pacote \(1\)
+                    \item B recebe pacote \(1\),
+                        envia ACK \(1\)
+                \end{enumerate}
+            \item \textbf{TCP:}
+                \begin{enumerate}
+                    \item A envia pacotes \(0 \dots 4\)
+                    \item Pacote \(1\) é perdido
+                    \item B recebe pacotes \(0, 2 \dots 4\),
+                        envia ACK \(0\) para cada pacote recebido
+                        (total 4)
+                    \item A recebe 4 ACKs \(0\),
+                        reenvia pacote \(1\)
+                        (depois de receber o terceiro)
+                    \item B recebe pacote \(1\),
+                        envia ACK \(4\)
+                \end{enumerate}
+        \end{itemize}
+        Resumo:
+        {\par\centering\begin{tabular}{|l|c|c|c|c|}\hline
+            & \textbf{Pacotes enviados} & \textbf{Total (pacotes)}
+                & \textbf{ACKs enviados} & \textbf{Total (ACKs)}
+                \\\hline
+            \textbf{GBN} & 0,1,2,3,4,1,2,3,4 & 9 & 0,1,2,3,4 & 5
+                \\\hline
+            \textbf{SR}  & 0,1,2,3,4,1 & 6 & 0,2,3,4,1 & 5 \\\hline
+            \textbf{TCP} & 0,1,2,3,4,1 & 6 & 0,0,0,0,4 & 5 \\\hline
+        \end{tabular}\medskip}
+        Note que os ACKs no TCP ``de verdade'' deveriam ter sido
+        incrementados em 1 (pedindo o próximo byte),
+        mas deixei assim para ficar mais fácil de comparar
+        com os outros.
+    \item TCP, pois não precisou do timeout.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{40}
+    \begin{exe-list}
+    \item \([1, 5)\) e \([23, \_)\),
+        são os intervalos que têm um crescimento exponencial.
+    \item \([5, 22)\),
+        é o intervalo que tem um crescimento linear.
+    \item ACK triplicado, pois não voltou para o slow start.
+    \item Timeout, pois voltou para o slow start.
+    \item Um valor no intervalo \((16, 32]\),
+        pois é quando para de crescer exponencialmente.
+    \item \(\frac{42}{2} = 21\),
+        foi settado na ultima falha (em 16)
+    \item \(\frac{29}{2} = 14\),
+        pois o último falha ocorreu com o tamanho de janela
+        igual à 29.
+    \item Assumindo que não vai ter mais falhas
+        (ACKs triplicados e timeouts).
+        O slow start termina em
+        \(23 + \lceil \log_2 14 \rceil = 23 + 4 = 27\)
+        e a partir daí é incrementado em \(1\),
+        então o tamanho da janela vai ser
+        \(16 + (70 - 27) = 59\).
+    \item O tamanho da janela vai ser \(\frac82 + 3 = 7\) e
+        o thresh hold vai ser \(\frac82 = 4\).
+    \item O tamanho da janela vai ser \(2^{(19-16+1)} = 2^{2} = 4\) e
+        o thresh hold vai ser \(\frac{42}{2} = 21\).
+    \item \(1, 2, 4, 8, 16, 32\) nos rounds \(17\) até \(22\),
+        totalizando em \(63\).
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{45}
+    TODO
+    \begin{exe-list}
+    \item
+    \item
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{49}
+    TODO
+\end{exe}
+
+\begin{exe}{52}
+    TODO
+\end{exe}
+
+\end{document}
