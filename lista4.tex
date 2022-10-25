@@ -1,0 +1,124 @@
+\documentclass{article}
+
+\usepackage[width=14cm, left=3cm, top=2cm]{geometry}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+
+\usepackage{multirow}
+
+\usepackage{ifthen}
+%\usepackage{minted}
+
+\newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
+\newcommand{\nobody}{ninguém}
+\newcommand{\preamble}[2]{\noindent%
+    Fiz esse trabalho com a ajuda de {\bfseries #1}
+    e consultei {\bfseries #2}.
+    A versão final do trabalho foi feita
+    por mim de forma independente.
+    Respostas sem no mínimo 3 frases de justificativa
+    não contam ponto.
+    \par\noindent Assinatura: \blank\blank\bigskip}
+
+\newcounter{exe-list}
+\newenvironment{exe-list}
+    {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
+    {\end{list}}
+
+\newenvironment{exe}[2][Problema]
+    {\newcommand{\opt}{(Opcional)}%
+    \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
+    \medskip\par\noindent\ifthenelse{\equal{#1}{}}
+        {\textbf{\large #2}}
+        {\textbf{\large #1~#2}}%
+    \medskip\par\noindent}
+    {\medskip}
+
+\title{Redes de Computadores - Lista 4 (parte 1)}
+\author{Daniel Kiyoshi Hashimoto Vouzella de Andrade - 119025937}
+\date{Outubro 2022}
+
+\begin{document}
+\maketitle
+
+%\preamble{\blank}{\blank}
+
+\begin{exe}{1}
+    \begin{exe-list}
+    \item A tabela deve conter a linha:
+        \begin{center} \begin{tabular}{|c|c|} \hline
+            \textbf{Destination Address}
+                & \textbf{Link Interface} \\\hline
+            H3 & 3 \\\hline
+        \end{tabular} \end{center}
+    \item A princípio não, pois as tabelas não possuem uma entrada
+        para a origem do pacote.
+        Mas é possível, usando SDNs, criar tabelas complexas
+        que utilizam o IP de origem do pacote para saber
+        como tratá-lo.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{2}
+    \begin{exe-list}
+    \item Não, pois o \emph{shared bus} fica ``ocupado''.
+        Apenas um pacote pode ser transmitido por vez.
+    \item Não, apenas uma posição de memória
+        pode ser escrita por vez.
+    \item Não, cada port só pode receber um pacote por vez.
+        Mas poderia se fossem para dois output ports diferentes.
+        Utilizando arquiteturas mais sofisticadas,
+        é possível ter várias ``linhas'' de comunicação,
+        permitindo a transferência paralela.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{5}
+    \begin{exe-list}
+    \item \hspace{1ex}
+        \begin{center} \begin{tabular}{|ll|c|} \hline
+            \multicolumn{2}{|c|}{\textbf{Prefix}}
+                & \textbf{Link Interface} \\\hline\hline
+            1110.0000 & 00        & 0 \\\hline
+            1110.0000 & 0100.0000 & 1 \\\hline
+            1110.0000 &           & 2 \\\hline
+            1110.0001 & 0         & 2 \\\hline
+            \multicolumn{2}{|c|}{Otherwise} & 3 \\\hline
+        \end{tabular} \end{center}
+    \item
+        \begin{itemize}
+        \item \textbf{1100.1000 1001.0001 0101.0001 0101.0101:}\par
+            Não dá match com nenhum prefixo,
+            então cai no \emph{otherwise};
+            escolhe 3.
+        \item \textbf{1110.0001 0100.0000 1100.0011 0011.1100:}\par
+            Apenas dá match no prefixo \textbf{1110.0001 0};
+            escolhe 2.
+        \item \textbf{1110.0001 1000.0000 0001.0001 0111.0111:}\par
+            Não dá match com nenhum prefixo,
+            então cai no \emph{otherwise};
+            escolhe 3.
+        \end{itemize}
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{6}
+    \begin{center} \begin{tabular}{|l|c|c|} \hline
+        \textbf{Prefix} & \textbf{Range begin}
+            & \textbf{Range end} \\\hline\hline
+        00  & 0000.0000 & 0011.1111 \\\hline
+        010 & 0100.0000 & 0101.1111 \\\hline
+        011 & 0110.0000 & 0111.1111 \\\hline
+        10  & 1000.0000 & 1011.1111 \\\hline
+        11  & 1100.0000 & 1111.1111 \\\hline
+    \end{tabular} \end{center}
+\end{exe}
+
+\end{document}
