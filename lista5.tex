@@ -1,0 +1,912 @@
+\documentclass{article}
+
+\usepackage[width=14cm, left=3cm, top=2cm]{geometry}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+\usepackage{multirow}
+
+\usepackage{ifthen}
+%\usepackage{minted}
+
+\newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
+\newcommand{\nobody}{ninguém}
+\newcommand{\preamble}[2]{\noindent%
+    Fiz esse trabalho com a ajuda de {\bfseries #1}
+    e consultei {\bfseries #2}.
+    A versão final do trabalho foi feita
+    por mim de forma independente.
+    Respostas sem no mínimo 3 frases de justificativa
+    não contam ponto.
+    \par\noindent Assinatura: \blank\blank\bigskip}
+
+\newcounter{exe-list}
+\newenvironment{exe-list}
+    {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
+    {\end{list}}
+
+\newenvironment{exe}[2][Problema]
+    {\newcommand{\opt}{(Opcional)}%
+    \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
+    \medskip\par\noindent\ifthenelse{\equal{#1}{}}
+        {\textbf{\large #2}}
+        {\textbf{\large #1~#2}}%
+    \medskip\par\noindent}
+    {\medskip}
+
+\newenvironment{dijkstra-table}{
+    \begin{center}\begin{tabular}{|c|rcl|rcl|rcl|rcl|rcl|rcl|rcl|}
+        \hline
+        \multirow{2}{*}{\textbf{step}}
+            & \multicolumn{3}{|c|}{\textbf{x}}
+            & \multicolumn{3}{|c|}{\textbf{y}}
+            & \multicolumn{3}{|c|}{\textbf{z}}
+            & \multicolumn{3}{|c|}{\textbf{w}}
+            & \multicolumn{3}{|c|}{\textbf{v}}
+            & \multicolumn{3}{|c|}{\textbf{u}}
+            & \multicolumn{3}{|c|}{\textbf{t}}
+        \\
+            & \textbf{V} & \textbf{D} & \textbf{p}
+            & \textbf{V} & \textbf{D} & \textbf{p}
+            & \textbf{V} & \textbf{D} & \textbf{p}
+            & \textbf{V} & \textbf{D} & \textbf{p}
+            & \textbf{V} & \textbf{D} & \textbf{p}
+            & \textbf{V} & \textbf{D} & \textbf{p}
+            & \textbf{V} & \textbf{D} & \textbf{p}
+            \\\hline}
+    {\end{tabular}\end{center}}
+
+\newenvironment{distrib-table}{
+    \begin{center}\begin{tabular}{|c||lr|c|lr|}\hline
+        &\textbf{x}&\textbf{y}&\textbf{z}&\textbf{v}&\textbf{u}
+        \\\hline\hline}
+    {\end{tabular}\end{center}}
+
+\title{Redes de Computadores - Lista 5}
+\author{Daniel Kiyoshi Hashimoto Vouzella de Andrade - 119025937}
+\date{Novembro 2022}
+
+\begin{document}
+\maketitle
+
+%\preamble{\blank}{\blank}
+
+\begin{exe}{0}
+    Escolhendo um nó inicial \(i\):
+    \begin{enumerate}
+    \setcounter{enumi}{-1}
+    \item Inicializa tabela com colunas: \par
+        Nó \(v\),
+        Visitado = \(F\),
+        Custo = \((v == i) \:?\: 0 \::\: \infty\),
+        Caminho = Nil
+    \item Enquando existir nó \(v\) não visitado com menor custo:
+        \begin{enumerate}
+        \item Visitado \(v\) = \(T\)
+        \item Para cada Nó \(u\) não visitado e vizinho de \(v\):
+            \begin{enumerate}
+                \item \(newcost :=\) Custo \(v\) \(+\) Dist \(v, u\)
+                \item Se Custo \(u\) \(< newcost\):
+                    \begin{itemize}
+                        \item Custo \(u\) = \(newcost\)
+                        \item Path \(u\) = Path \(v \cdot v\)
+                    \end{itemize}
+            \end{enumerate}
+        \end{enumerate}
+    \end{enumerate}
+\end{exe}
+
+\begin{exe}{3}
+    \begin{dijkstra-table}
+        $ -1 $
+            &$ \bot $&$ 0 $&$ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 0 $
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 6 $& x
+            &$ \bot $&$ 8 $& x
+            &$ \bot $&$ 6 $& x
+            &$ \bot $&$ 3 $& x
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 1 $
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 6 $& x
+            &$ \bot $&$ 8 $& x
+            &$ \bot $&$ 6 $& x
+            &$ \top $&$ 3 $& x
+            &$ \bot $&$ 6 $& v
+            &$ \bot $&$ 7 $& v
+            \\\hline
+        $ 2 $
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 6 $& x
+            &$ \bot $&$ 8 $& x
+            &$ \bot $&$ 6 $& x
+            &$ \top $&$ 3 $& x
+            &$ \bot $&$ 6 $& v
+            &$ \bot $&$ 7 $& v
+            \\\hline
+        $ 3 $
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 6 $& x
+            &$ \bot $&$ 8 $& x
+            &$ \top $&$ 6 $& x
+            &$ \top $&$ 3 $& x
+            &$ \bot $&$ 6 $& v
+            &$ \bot $&$ 7 $& v
+            \\\hline
+        $ 4 $
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 6 $& x
+            &$ \bot $&$ 8 $& x
+            &$ \top $&$ 6 $& x
+            &$ \top $&$ 3 $& x
+            &$ \top $&$ 6 $& v
+            &$ \bot $&$ 7 $& v
+            \\\hline
+        $ 5 $
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 6 $& x
+            &$ \bot $&$ 8 $& x
+            &$ \top $&$ 6 $& x
+            &$ \top $&$ 3 $& x
+            &$ \top $&$ 6 $& v
+            &$ \top $&$ 7 $& v
+            \\\hline
+        $ 6 $
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 6 $& x
+            &$ \top $&$ 8 $& x
+            &$ \top $&$ 6 $& x
+            &$ \top $&$ 3 $& x
+            &$ \top $&$ 6 $& v
+            &$ \top $&$ 7 $& v
+            \\\hline
+    \end{dijkstra-table}
+\end{exe}
+
+\begin{exe}{4}
+    \begin{exe-list}
+    \item Começando pelo \textbf{t} \par
+    \begin{dijkstra-table}
+        $ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 0 $&$ -1 $
+            \\\hline
+        $ 0 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 7 $& t
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 4 $& t
+            &$ \bot $&$ 2 $& t
+            &$ \top $&$ 0 $&$ -1 $
+            \\\hline
+        $ 1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 7 $& t
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 5 $& u
+            &$ \bot $&$ 4 $& t
+            &$ \top $&$ 2 $& t
+            &$ \top $&$ 0 $&$ -1 $
+            \\\hline
+        $ 2 $
+            &$ \bot $&$ 7 $& v
+            &$ \bot $&$ 7 $& t
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 5 $& u
+            &$ \top $&$ 4 $& t
+            &$ \top $&$ 2 $& t
+            &$ \top $&$ 0 $&$ -1 $
+            \\\hline
+        $ 3 $
+            &$ \bot $&$ 7 $& v
+            &$ \bot $&$ 7 $& t
+            &$ \bot $&$ \infty $&
+            &$ \top $&$ 5 $& u
+            &$ \top $&$ 4 $& t
+            &$ \top $&$ 2 $& t
+            &$ \top $&$ 0 $&$ -1 $
+            \\\hline
+        $ 4 $
+            &$ \top $&$ 7 $& v
+            &$ \bot $&$ 7 $& t
+            &$ \bot $&$ 15 $& x
+            &$ \top $&$ 5 $& u
+            &$ \top $&$ 4 $& t
+            &$ \top $&$ 2 $& t
+            &$ \top $&$ 0 $&$ -1 $
+            \\\hline
+        $ 5 $
+            &$ \top $&$ 7 $& v
+            &$ \top $&$ 7 $& t
+            &$ \bot $&$ 15 $& x
+            &$ \top $&$ 5 $& u
+            &$ \top $&$ 4 $& t
+            &$ \top $&$ 2 $& t
+            &$ \top $&$ 0 $&$ -1 $
+            \\\hline
+        $ 6 $
+            &$ \top $&$ 7 $& v
+            &$ \top $&$ 7 $& t
+            &$ \top $&$ 15 $& x
+            &$ \top $&$ 5 $& u
+            &$ \top $&$ 4 $& t
+            &$ \top $&$ 2 $& t
+            &$ \top $&$ 0 $&$ -1 $
+            \\\hline
+    \end{dijkstra-table}
+    \item Começando pelo \textbf{u} \par
+    \begin{dijkstra-table}
+        $ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 0 $&$ -1 $
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 0 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 3 $& u
+            &$ \bot $&$ 3 $& u
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 2 $& u
+            \\\hline
+        $ 1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 9 $& t
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 3 $& u
+            &$ \bot $&$ 3 $& u
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 2 $& u
+            \\\hline
+        $ 2 $
+            &$ \bot $&$ 9 $& w
+            &$ \bot $&$ 9 $& t
+            &$ \bot $&$ \infty $&
+            &$ \top $&$ 3 $& u
+            &$ \bot $&$ 3 $& u
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 2 $& u
+            \\\hline
+        $ 3 $
+            &$ \bot $&$ 6 $& v
+            &$ \bot $&$ 9 $& t
+            &$ \bot $&$ \infty $&
+            &$ \top $&$ 3 $& u
+            &$ \top $&$ 3 $& u
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 2 $& u
+            \\\hline
+        $ 4 $
+            &$ \top $&$ 6 $& v
+            &$ \bot $&$ 9 $& t
+            &$ \bot $&$ 14 $& x
+            &$ \top $&$ 3 $& u
+            &$ \top $&$ 3 $& u
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 2 $& u
+            \\\hline
+        $ 5 $
+            &$ \top $&$ 6 $& v
+            &$ \top $&$ 9 $& t
+            &$ \bot $&$ 14 $& x
+            &$ \top $&$ 3 $& u
+            &$ \top $&$ 3 $& u
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 2 $& u
+            \\\hline
+        $ 6 $
+            &$ \top $&$ 6 $& v
+            &$ \top $&$ 9 $& t
+            &$ \top $&$ 14 $& x
+            &$ \top $&$ 3 $& u
+            &$ \top $&$ 3 $& u
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 2 $& u
+            \\\hline
+    \end{dijkstra-table}
+    \item Começando pelo \textbf{v} \par
+    \begin{dijkstra-table}
+        $ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 0 $&$ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 0 $
+            &$ \bot $&$ 3 $& v
+            &$ \bot $&$ 8 $& v
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 4 $& v
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 3 $& v
+            &$ \bot $&$ 4 $& v
+            \\\hline
+        $ 1 $
+            &$ \top $&$ 3 $& v
+            &$ \bot $&$ 8 $& v
+            &$ \bot $&$ 11 $& x
+            &$ \bot $&$ 4 $& v
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 3 $& v
+            &$ \bot $&$ 4 $& v
+            \\\hline
+        $ 2 $
+            &$ \top $&$ 3 $& v
+            &$ \bot $&$ 8 $& v
+            &$ \bot $&$ 11 $& x
+            &$ \bot $&$ 4 $& v
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 3 $& v
+            &$ \bot $&$ 4 $& v
+            \\\hline
+        $ 3 $
+            &$ \top $&$ 3 $& v
+            &$ \bot $&$ 8 $& v
+            &$ \bot $&$ 11 $& x
+            &$ \top $&$ 4 $& v
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 3 $& v
+            &$ \bot $&$ 4 $& v
+            \\\hline
+        $ 4 $
+            &$ \top $&$ 3 $& v
+            &$ \bot $&$ 8 $& v
+            &$ \bot $&$ 11 $& x
+            &$ \top $&$ 4 $& v
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 3 $& v
+            &$ \top $&$ 4 $& v
+            \\\hline
+        $ 5 $
+            &$ \top $&$ 3 $& v
+            &$ \top $&$ 8 $& v
+            &$ \bot $&$ 11 $& x
+            &$ \top $&$ 4 $& v
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 3 $& v
+            &$ \top $&$ 4 $& v
+            \\\hline
+        $ 6 $
+            &$ \top $&$ 3 $& v
+            &$ \top $&$ 8 $& v
+            &$ \top $&$ 11 $& x
+            &$ \top $&$ 4 $& v
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 3 $& v
+            &$ \top $&$ 4 $& v
+            \\\hline
+    \end{dijkstra-table}
+    \item Começando pelo \textbf{w} \par
+    \begin{dijkstra-table}
+        $ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 0 $&$ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 0 $
+            &$ \bot $&$ 6 $& w
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 4 $& w
+            &$ \bot $&$ 3 $& w
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 1 $
+            &$ \bot $&$ 6 $& w
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 4 $& w
+            &$ \top $&$ 3 $& w
+            &$ \bot $&$ 5 $& u
+            \\\hline
+        $ 2 $
+            &$ \bot $&$ 6 $& w
+            &$ \bot $&$ 12 $& v
+            &$ \bot $&$ \infty $&
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 4 $& w
+            &$ \top $&$ 3 $& w
+            &$ \bot $&$ 5 $& u
+            \\\hline
+        $ 3 $
+            &$ \bot $&$ 6 $& w
+            &$ \bot $&$ 12 $& v
+            &$ \bot $&$ \infty $&
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 4 $& w
+            &$ \top $&$ 3 $& w
+            &$ \top $&$ 5 $& u
+            \\\hline
+        $ 4 $
+            &$ \top $&$ 6 $& w
+            &$ \bot $&$ 12 $& v
+            &$ \bot $&$ 14 $& x
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 4 $& w
+            &$ \top $&$ 3 $& w
+            &$ \top $&$ 5 $& u
+            \\\hline
+        $ 5 $
+            &$ \top $&$ 6 $& w
+            &$ \top $&$ 12 $& v
+            &$ \bot $&$ 14 $& x
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 4 $& w
+            &$ \top $&$ 3 $& w
+            &$ \top $&$ 5 $& u
+            \\\hline
+        $ 6 $
+            &$ \top $&$ 6 $& w
+            &$ \top $&$ 12 $& v
+            &$ \top $&$ 14 $& x
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 4 $& w
+            &$ \top $&$ 3 $& w
+            &$ \top $&$ 5 $& u
+            \\\hline
+    \end{dijkstra-table}
+    \item Começando pelo \textbf{y} \par
+    \begin{dijkstra-table}
+        $ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 0 $&$ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 0 $
+            &$ \bot $&$ 6 $& y
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 12 $& z
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 8 $& y
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 7 $& y
+            \\\hline
+        $ 1 $
+            &$ \top $&$ 6 $& y
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 12 $& z
+            &$ \bot $&$ 12 $& x
+            &$ \bot $&$ 8 $& y
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 7 $& y
+            \\\hline
+        $ 2 $
+            &$ \top $&$ 6 $& y
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 12 $& z
+            &$ \bot $&$ 12 $& x
+            &$ \top $&$ 8 $& y
+            &$ \bot $&$ 11 $& v
+            &$ \bot $&$ 7 $& y
+            \\\hline
+        $ 3 $
+            &$ \top $&$ 6 $& y
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 12 $& z
+            &$ \bot $&$ 12 $& x
+            &$ \top $&$ 8 $& y
+            &$ \bot $&$ 9 $& t
+            &$ \top $&$ 7 $& y
+            \\\hline
+        $ 4 $
+            &$ \top $&$ 6 $& y
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 12 $& z
+            &$ \bot $&$ 11 $& u
+            &$ \top $&$ 8 $& y
+            &$ \top $&$ 9 $& t
+            &$ \top $&$ 7 $& y
+            \\\hline
+        $ 5 $
+            &$ \top $&$ 6 $& y
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 12 $& z
+            &$ \top $&$ 11 $& u
+            &$ \top $&$ 8 $& y
+            &$ \top $&$ 9 $& t
+            &$ \top $&$ 7 $& y
+            \\\hline
+        $ 6 $
+            &$ \top $&$ 6 $& y
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 12 $& z
+            &$ \top $&$ 11 $& u
+            &$ \top $&$ 8 $& y
+            &$ \top $&$ 9 $& t
+            &$ \top $&$ 7 $& y
+            \\\hline
+    \end{dijkstra-table}
+    \item Começando pelo \textbf{z} \par
+    \begin{dijkstra-table}
+        $ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ 0 $&$ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 0 $
+            &$ \bot $&$ 8 $& z
+            &$ \bot $&$ 12 $& z
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 1 $
+            &$ \top $&$ 8 $& z
+            &$ \bot $&$ 12 $& z
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 14 $& x
+            &$ \bot $&$ 11 $& x
+            &$ \bot $&$ \infty $&
+            &$ \bot $&$ \infty $&
+            \\\hline
+        $ 2 $
+            &$ \top $&$ 8 $& z
+            &$ \bot $&$ 12 $& z
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 14 $& x
+            &$ \top $&$ 11 $& x
+            &$ \bot $&$ 14 $& v
+            &$ \bot $&$ 15 $& v
+            \\\hline
+        $ 3 $
+            &$ \top $&$ 8 $& z
+            &$ \top $&$ 12 $& z
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \bot $&$ 14 $& x
+            &$ \top $&$ 11 $& x
+            &$ \bot $&$ 14 $& v
+            &$ \bot $&$ 15 $& v
+            \\\hline
+        $ 4 $
+            &$ \top $&$ 8 $& z
+            &$ \top $&$ 12 $& z
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 14 $& x
+            &$ \top $&$ 11 $& x
+            &$ \bot $&$ 14 $& v
+            &$ \bot $&$ 15 $& v
+            \\\hline
+        $ 5 $
+            &$ \top $&$ 8 $& z
+            &$ \top $&$ 12 $& z
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 14 $& x
+            &$ \top $&$ 11 $& x
+            &$ \top $&$ 14 $& v
+            &$ \bot $&$ 15 $& v
+            \\\hline
+        $ 6 $
+            &$ \top $&$ 8 $& z
+            &$ \top $&$ 12 $& z
+            &$ \top $&$ 0 $&$ -1 $
+            &$ \top $&$ 14 $& x
+            &$ \top $&$ 11 $& x
+            &$ \top $&$ 14 $& v
+            &$ \top $&$ 15 $& v
+            \\\hline
+    \end{dijkstra-table}
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{5}
+    \begin{itemize}
+        \item Passo 0:
+            \begin{distrib-table}
+                \textbf{x}&$ \infty $&$ \infty $&$ \infty $&$ \infty $&$ \infty $\\
+                \textbf{y}&$ \infty $&$ \infty $&$ \infty $&$ \infty $&$ \infty $\\\hline
+                \textbf{z}&$ 2 $&$ \infty $&$ 0 $&$ 6 $&$ \infty $\\\hline
+                \textbf{v}&$ \infty $&$ \infty $&$ \infty $&$ \infty $&$ \infty $\\
+                \textbf{u}&$ \infty $&$ \infty $&$ \infty $&$ \infty $&$ \infty $\\\hline
+            \end{distrib-table}
+        \item Passo 1:
+            \begin{distrib-table}
+                \textbf{x}&$ 0 $&$ 3 $&$ 2 $&$ 3 $&$ \infty $\\
+                \textbf{y}&$ \infty $&$ \infty $&$ \infty $&$ \infty $&$ \infty $\\\hline
+                \textbf{z}&$ 2 $&$ 5 $&$ 0 $&$ 5 $&$ 7 $\\\hline
+                \textbf{v}&$ 3 $&$ \infty $&$ 6 $&$ 0 $&$ 1 $\\
+                \textbf{u}&$ \infty $&$ \infty $&$ \infty $&$ \infty $&$ \infty $\\\hline
+            \end{distrib-table}
+        \item Passo 2:
+            \begin{distrib-table}
+                \textbf{x}&$ 0 $&$ 3 $&$ 2 $&$ 3 $&$ 4 $\\
+                \textbf{y}&$ 3 $&$ 0 $&$ \infty $&$ \infty $&$ 2 $\\\hline
+                \textbf{z}&$ 2 $&$ 5 $&$ 0 $&$ 5 $&$ 6 $\\\hline
+                \textbf{v}&$ 3 $&$ 3 $&$ 5 $&$ 0 $&$ 1 $\\
+                \textbf{u}&$ \infty $&$ 2 $&$ \infty $&$ 1 $&$ 0 $\\\hline
+            \end{distrib-table}
+        \item Passo 3:
+            \begin{distrib-table}
+                \textbf{x}&$ 0 $&$ 3 $&$ 2 $&$ 3 $&$ 4 $\\
+                \textbf{y}&$ 3 $&$ 0 $&$ 5 $&$ 3 $&$ 2 $\\\hline
+                \textbf{z}&$ 2 $&$ 5 $&$ 0 $&$ 5 $&$ 6 $\\\hline
+                \textbf{v}&$ 3 $&$ 3 $&$ 5 $&$ 0 $&$ 1 $\\
+                \textbf{u}&$ 4 $&$ 2 $&$ 7 $&$ 1 $&$ 0 $\\\hline
+            \end{distrib-table}
+        \item Passo 4:
+            \begin{distrib-table}
+                \textbf{x}&$ 0 $&$ 3 $&$ 2 $&$ 3 $&$ 4 $\\
+                \textbf{y}&$ 3 $&$ 0 $&$ 5 $&$ 3 $&$ 2 $\\\hline
+                \textbf{z}&$ 2 $&$ 5 $&$ 0 $&$ 5 $&$ 6 $\\\hline
+                \textbf{v}&$ 3 $&$ 3 $&$ 5 $&$ 0 $&$ 1 $\\
+                \textbf{u}&$ 4 $&$ 2 $&$ 6 $&$ 1 $&$ 0 $\\\hline
+            \end{distrib-table}
+        \item Passo 5:
+            \begin{distrib-table}
+                \textbf{x}&$ 0 $&$ 3 $&$ 2 $&$ 3 $&$ 4 $\\
+                \textbf{y}&$ 3 $&$ 0 $&$ 5 $&$ 3 $&$ 2 $\\\hline
+                \textbf{z}&$ 2 $&$ 5 $&$ 0 $&$ 5 $&$ 6 $\\\hline
+                \textbf{v}&$ 3 $&$ 3 $&$ 5 $&$ 0 $&$ 1 $\\
+                \textbf{u}&$ 4 $&$ 2 $&$ 6 $&$ 1 $&$ 0 $\\\hline
+            \end{distrib-table}
+    \end{itemize}
+\end{exe}
+
+\begin{exe}{6}
+    Suponha que o grafo que representa a rede tenha
+    que a maior distância entre quaisquer dois nós seja \(d\),
+    desconsiderando os pesos das arestas,
+    ou seja, liste todos os menores caminhos entre dois nós,
+    \(d\) é o maior número dessa lista.
+    Seja \(a\) um nó exemplo desse grafo.
+    \par
+    Sabemos que na iteração \(0\),
+    o nó \(a\) sabe somente das arestas que levam até seus vizinhos e
+    ninguém disse nada para ele.
+    Na iteração \(1\), os vizinhos de \(a\) ``contam'' para ele
+    como é o grafo na vizinhança deles,
+    pois no final da iteração \(0\) eles mandam uma mensagem
+    com essa descrição.
+    Dessa forma, agora, \(a\) conhece ``todas''
+    as arestas que ele consegue alcançar em \(2\) passos.
+    Na iteração \(2\), ``chegam''
+    as mensagens dos \(2\)-vizinhos de \(a\)
+    (os nós a exatamente \(2\) arestas de distância),
+    pois como estão a \(2\) de distância as mensagems demoram
+    \(2\) iterações para chegar.
+    Então ele conhece ``todas'' as arestas do grafo
+    que ele chega em \(3\) passos.
+    Assim, na iteração \(i\),
+    \(a\) vai receber a mensagem dos \(i\)-vizinhos e
+    vai conhecer ``todas'' as arestas
+    que consegue alcançar em \(i+1\) passos.
+    \par
+    Note que não é exatamente assim que as coisas acontecem,
+    por isso as aspas em vários lugares.
+    Na verdade, no algorítmo e implementação,
+    são encaminhadas informações
+    mais abstradas e resumidas sobre a topologia do grafo,
+    as distâncias (com pesos) entre cada nó,
+    sendo atualizada a cada iteração.
+    Entretanto essa analogia continua funcionando.
+    \par
+    No pior caso, existem pelo menos dois nós \(z_0, z_1\)
+    com uma distância \(d\) de \(a\) para eles e
+    existe uma aresta entre \(z_0\) e \(z_1\).
+    \(a\) só vai conseguir alcançar o nó \(z_0\)
+    na iteração \(d-1\),
+    pois vai conhecer todos os caminhos de até \(d\) passos,
+    portante vai conseguir alcançar/enviar uma mensagem para \(z_0\).
+    Entretanto, não podemos garantir que esse é o melhor caminho,
+    pois ainda não conseguimos perceber
+    a aresta entre \(z_0\) e \(z_1\).
+    Dessa forma, na próxima iteração \((d)\),
+    \(a\) vai ``receber'' informação sobre essa aresta faltante
+    e vai poder determinar o melhor caminho até \(z_0\)
+    (ou qualquer outro nó).
+    \par
+    Mas note que as tabelas continuam dessincronizadas.
+    Em uma condição mais realista
+    (onde não se envia uma vizinhança inteira do grafo toda iteração),
+    na iteração \(d\),
+    \(a\) recebeu as informações de \(z_0\)
+    referêntes a iteração \(0\),
+    então na iteração \(d+1\), ele receberá informações
+    referêntes a iteração \(1\),
+    e assim por diante.
+    De forma que na iteração \(2d\),
+    todas as tabelas estejam sincronizadas.
+\end{exe}
+
+\begin{exe}{7}
+    \begin{exe-list}
+    \item \hspace{1ex}\par
+        \begin{center}\begin{tabular}{|c|rcl|}\hline
+            & \textbf{w} & \textbf{y} & \textbf{u} \\\hline
+            \textbf{x} & 2 & 5 & 7 \\\hline
+        \end{tabular}\end{center}
+    \item Basta uma mudança em \(c(x, w)\) ou que faça:
+        \[
+            c(x, w) + 5 > c(x, y) + 6
+            \quad\Longrightarrow\quad
+            c(x, y) < c(x, w) - 1
+        \]
+        Note que alterar o \(c(x, w)\) vai melhorar ou piorar
+        o caminho, então vai informar os vizinhos.
+        Por exemplo: \(c(x, w) \leftarrow 7\).
+    \item Basta uma mudança em \(c(x, y)\) que mantenha:
+        \[
+            c(x, w) + 5 \le c(x, y) + 6
+            \quad\Longrightarrow\quad
+            c(x, y) \ge c(x, w) - 1
+        \]
+        Note que alterar o \(c(x, w)\) vai melhorar ou piorar
+        o caminho, então vai informar os vizinhos.
+        Por exemplo: \(c(x, y) \leftarrow 6\)
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{9}
+    Diminuir o peso de um link entre nós \(u\) e \(v\)
+    não causa o problema de \emph{count-to-infinity},
+    pois isso vai diminuir \(D_u(v)\) e vai ser propagado.
+    Durante a propagação no nó \(a\), temos dois casos:
+    \(D_a(v)\) vai ser substituído por um valor menor
+    e causar outra propagação;
+    ou vai ser ignorado e não vai ser propagado.
+    Um nó que já propagou, ao receber uma propagação,
+    só vai alterar a tabela se receber ``uma proposta melhor''
+    do que a atual.
+
+    Uma outra explicação é que no problema de \emph{count-to-infinity}
+    um nó \(v\) perde um caminho bom para o alvo \(t\),
+    mas acredita que existe outro caminho que passa \(u\),
+    então ele atualiza a sua tabela para passar por \(u\).
+    Porém, o caminho de \(u\) para \(t\) passava por \(v\),
+    então um nó acha que o outro sabe chegar no \(t\),
+    mas na verdade nenhum dos dois sabe.
+    Diminuir o peso de um link não faz um nó perder um caminho bom
+    para o alvo, só encontra um melhor.
+
+    Conectar dois nós que não estavam previamente conectados
+    tem um efeito semelhante a chegar uma informação de que
+    um vizinho conhece um caminho para o outro nó.
+    Se esse caminho for melhor,
+    vai acontecer algo análogo à diminuir o peso de um link.
+    Se o caminho for pior,
+    o nó vai ignorá-lo, pois já conhece um caminho melhor.
+
+    Uma outra forma de pensar é dizer que o link sempre existiu,
+    mas foi reduzido de \(\infty\) para uma quantidade ``finita''.
+\end{exe}
+
+\begin{exe}{9 - Continuação}
+    O site mostra um conjunto de regras que tenta resolver
+    o problema de \emph{count-to-infinity}.
+    A ideia é contar uma ``mentira branca'' para os nós
+    que fazem parte do caminho até o nó \(t\) sobre
+    saber como chegar até \(t\);
+    por exemplo, se o nó \(v\) repassa o pacote para \(u\)
+    para alcançar o \(t\), \(v\) diz apenas para \(u\)
+    que não sabe chegar em \(t\).
+    Infelizmente essas regras só resolvem o problema
+    em topoligias mais simples.
+\end{exe}
+
+\begin{exe}[Desafio]{}
+    O objetivo da prova é mostrar que para um grafo \(G\)
+    o algorítmo encontra corretamente
+    o melhor caminho (mais curto/menor soma de pesos)
+    que sai do nó inicial \(s\) e chega a outro nó \(t\).
+
+    Durante a execução do algorítmo temos os conjuntos:
+    \(N_i \subseteq V(G)\) o conjunto de nós visitados; e
+    \(F_i \subseteq V(G)\) a fronteira,
+    o conjunto de nós que podem ser
+    alcançados a partir de um nó de \(N_i\) usando apenas uma aresta
+    e não estão em \(N_i\).
+    Nesses casos \(i\) é apenas um contador da iteração atual.
+
+    Tentamos mostrar por indução que a seguinte propriedade se mantém:
+    \emph{Em todos as iterações do algorítmo,
+    o caminho escolhido entre \(s\) e outro nó de \(N_i\),
+    tem um tamanho igual ou melhor ao tamanho do caminho ótimo.}
+    \begin{itemize}
+        \item \textbf{Caso base:} \(N_0 = \{ s \}\) \par
+            A única escolha possível de ``outro nó'' é \(s\),
+            o tamanho do caminho ótimo de \(s\) até \(s\) é \(0\),
+            assim como dito pelo algorítmo.
+        \item \textbf{Passo indutivo:} \(i\) \par
+            Sabemos que todas as distâncias até os nós de \(N_i\)
+            são ótimas.
+            Estamos querendo adicionar um nó \(v \in F_i\) ao \(N_i\),
+            de forma que \(N_{i+1} = N_i \cup \{v\}\),
+            e o caminho escolhido até \(v\) passa por \(u \in N_i\)
+            imediatamente antes de chegar em \(v\).
+
+            Vamos assumir que no melhor caminho até \(v\),
+            o último nó de \(N_i\) é \(x\) e
+            o nó seguinte é \(y \in F_i\),
+            e então podem ter \(0\) ou mais nós entre \(y\) e \(v\).
+            Note que é possível que
+            \(x\) seja \(s\) e/ou \(y\) seja \(v\).
+
+            Sendo \(D_s(n)\) a distância de \(s\) até \(n \in V(G)\)
+            escolhida pelo algorítmo,
+            \(D^*_s(n)\) a distância ótima de \(s\) até \(n \in V(G)\)
+            e \(C(n, m)\) é o custo da aresta entre \(n, m \in V(G)\),
+            temos as seguintes afirmações:
+            \begin{align}
+                \label{sxy-le-opv}
+                D_s(x) + C(x, y) \le D^*_s(v) \\
+                \label{sy-le-sxy}
+                D_s(y) \le D_s(x) +  C(x, y) \\
+                \label{sv-le-sy}
+                D_s(v) \le D_s(y)
+            \end{align}
+            (\ref{sxy-le-opv})
+            é obtida através da hipotese de indução e
+            da definição de caminho ótimo.
+            (\ref{sy-le-sxy}) vêm da hipótese inicial sobre \(G\)
+            que não possui arestas negativas e que \(y \in F_i\).
+            Sabemos que (\ref{sv-le-sy}), pois \(y\) não foi escolhido
+            pelo algorítmo até o presente momento,
+            mas \(v\) foi escolhido agora.
+            Podemos juntar as expressões da seguinte forma:
+            \begin{align*}
+                D_s(y) &\le D^*_s(v)
+                    &&\text{Usando \ref{sy-le-sxy} e \ref{sxy-le-opv}}\\
+                D_s(v) &\le D^*_s(v)
+                    &&\text{Usando \ref{sv-le-sy}}\\
+            \end{align*}
+            Como, por definição, \(D_s(v) < D^*_s(v)\) é impossível,
+            concluímos que \(D_s(v) = D^*_s(v)\).
+            E a hipótese de indução continua valendo para
+            a iteração \(i+1\).
+
+            \emph{Note que foi usado uma expressão a menos,
+            comparando com o vídeo.
+            A expressão extra apenas adicionava artificialmente
+            a ``conveniência'' de uma prova por contradição.}
+    \end{itemize}
+    Assim, sabemos que no final do algorítmo
+    todos os caminhos escolhidos tem tamanho igual
+    ao caminho ótimo.
+\end{exe}
+
+\end{document}
