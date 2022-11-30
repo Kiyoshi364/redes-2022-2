@@ -1,0 +1,382 @@
+\documentclass{article}
+
+\usepackage[width=14cm, left=3cm, top=2cm]{geometry}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{multicol}
+
+\usepackage{ifthen}
+%\usepackage{minted}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\usepgfplotslibrary{external}
+\tikzexternalize
+
+\newcommand{\blank}{\rule[0pt]{5em}{.3pt}}
+\newcommand{\nobody}{ninguém}
+\newcommand{\preamble}[2]{\noindent%
+    Fiz esse trabalho com a ajuda de {\bfseries #1}
+    e consultei {\bfseries #2}.
+    A versão final do trabalho foi feita
+    por mim de forma independente.
+    Respostas sem no mínimo 3 frases de justificativa
+    não contam ponto.
+    \par\noindent Assinatura: \blank\blank\bigskip}
+
+\newcounter{exe-list}
+\newenvironment{exe-list}
+    {\begin{list}{\alph{exe-list}.}{\usecounter{exe-list}}}
+    {\end{list}}
+
+\newenvironment{exe}[2][Problema]
+    {\newcommand{\opt}{(Opcional)}%
+    \newcommand{\sketch}[1]{{\bfseries Rascunho:} ##1}%
+    \medskip\par\noindent\ifthenelse{\equal{#1}{}}
+        {\textbf{\large #2}}
+        {\textbf{\large #1~#2}}%
+    \medskip\par\noindent}
+    {\medskip}
+
+\title{Redes de Computadores - Lista 6}
+\author{Daniel Kiyoshi Hashimoto Vouzella de Andrade - 119025937}
+\date{Dezembro 2022}
+
+\begin{document}
+\maketitle
+
+\begin{exe}{8}
+    \begin{exe-list}
+    \item
+        Derivando \(f(p) := N \; p \; (1 - p)^{N-1}\)
+        em relação a \(p\):
+        \begin{align*}
+            \frac{d \; f}{dp} &=
+            N \; \left[
+                -(N-1) \; p \; (1 - p)^{N-2} + (1 - p)^{N-1}
+            \right] \\
+            &= N \; ( (1 - p) - (N-1) \; p ) \; (1 - p)^{N-2} \\
+            &= N \; ( 1 - p - N \; p + p ) \; (1 - p)^{N-2} \\
+            &= N \; ( 1 - N \; p ) \; (1 - p)^{N-2} \\
+        \end{align*}
+        As raízes são \(p = \frac1N\) e \(p = 1\).
+        Então, devemos observar os pontos
+        \( \left\{ 0, \frac1N, 1 \right\}\),
+        (as raízes e os limites):
+        \begin{align*}
+            f(0)
+                &= N \cdot 0 \; (1 - 0)^{N-1} \\
+                &= 0 \\\\
+            f\left(\frac1N\right)
+                &= N \; \frac1N \; \left(1 - \frac1N\right)^{N-1} \\
+                &= \left(1 - \frac1N\right)^{N-1} \\\\
+            f(1)
+                &= N \cdot 1 \; (1 - 1)^{N-1} \\
+                &= 0
+        \end{align*}
+        O \(p\) que maximiza \(f\) é \(p = \frac1N\).
+    \item
+        Usando que \(p = \frac1N\):
+        \begin{align*}
+            f(p)
+            &= \left(1 - \frac1N\right)^{N-1} \\
+            &= \left(1 - \frac1N\right)^N \; \frac{1}{1 - \frac1N}
+        \end{align*}
+        Quando \(N \to +\infty\),
+        \(\left(1 - \frac1N\right)^N = \frac1e\):
+        \begin{align*}
+            f(p)
+            &= \frac1e \; \frac{1}{1 - \frac1N} \\
+            &\approx \frac1e
+        \end{align*}
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{9}
+    Calculando a derivada da eficiência do pure ALOHA
+    \(g(p) := N \; p \; (1 - p)^{2(N-1)}\):
+    \begin{align*}
+        \frac{d \; g}{dp}
+        &= N \; \left[
+            -2 \; (N-1) \; p \; (1 - p)^{2N-3} + (1 - p)^{2N-2}
+        \right] \\
+        &= N \; ( -2 \; (N-1) \; p + (1 - p) ) \; (1 - p)^{2N-3} \\
+        &= N \; ( -2N \; p + 2 p + 1 - p ) \; (1 - p)^{2N-3} \\
+        &= N \; ( -2N \; p + p + 1 ) \; (1 - p)^{2N-3} \\
+        &= N \; (1 - (2N-1) \; p) \; (1 - p)^{2N-3} \\
+    \end{align*}
+    As raízes são \(p = \frac{1}{2N - 1}\) e \(p = 1\).
+    Então, devemos observar os pontos
+    \( \left\{ 0, \frac{1}{2N-1}, 1 \right\}\),
+    (as raízes e os limites):
+    \begin{align*}
+        g(0)
+            &= N \cdot 0 \; (1 - 0)^{2(N-1)} \\
+            &= 0 \\\\
+        g\left(\frac{1}{2N-1}\right)
+            &= N \; \frac{1}{2N-1} \; \left(1 - \frac{1}{2N-1}\right)^{2(N-1)} \\\\
+        g(1)
+            &= N \cdot 1 \; (1 - 1)^{2(N-1)} \\
+            &= 0
+    \end{align*}
+    O \(p\) que maximiza \(g\) é \(p = \frac{1}{2N-1}\).
+    Usando que \(p = \frac{1}{2N-1}\):
+    \begin{align*}
+        g(p)
+        &= N \; \frac{1}{2N-1} \; \left(1 - \frac{1}{2N-1}\right)^{2(N-1)} \\
+        &= \frac{N}{2N-1}
+            \; \left(1 - \frac{1}{2N-1}\right)^{2N-1}
+            \; \frac{1}{1 - \frac{1}{2N-1}} \\
+    \end{align*}
+    Quando \(N \to +\infty\),
+    \(\left(1 - \frac{1}{2N-1}\right)^\frac{1}{2N-1}= \frac1e\) e
+    \(\frac{N}{2N-1} = \frac12\):
+    \begin{align*}
+        g(p)
+        &= \frac12 \; \frac1e \; \frac{1}{1 - \frac{1}{2N-1}} \\
+        &\approx \frac{1}{2e}
+    \end{align*}
+\end{exe}
+
+\begin{exe}{10}
+    \begin{exe-list}
+    \item
+        A probabilidade de \(A\) transmitir sem colisão é
+        \(s_A := p_A \; (1 - p_B)\),
+        similarmente,
+        a probabilidade de \(B\) transmitir sem colisão é
+        \(s_B := p_B \; (1 - p_A)\).
+        O throughput de \(A\) é \(s_A\) pacotes por slot.
+        A eficiência total é \(s_A + s_B\).
+    \item
+        Com \(p_A = 2 \; p_B\):
+        \begin{align*}
+            s_A &= 2 \; p_B \; (1 - p_B) \\\\
+            s_B &= p_B \; (1 - 2 \; p_B) \\
+            &= 2 \; p_B \; \left( \frac12 - p_B \right) \\
+        \end{align*}
+        Restringindo \(s_A = 2 \; s_B\):
+        \begin{align*}
+            s_A &= 2 \; s_B \\
+            2 \; p_B \; (1 - p_B) &= 2 \; p_B \; (1 - 2 \; p_B) \\
+            1 - p_B &= 1 - 2 \; p_B \\
+            p_B &= 0 \\
+        \end{align*}
+        Então não dá para achar \(p_A\) e \(p_B\),
+        com \(p_A = 2 \; p_B\) e \(p_B \ne 0\),
+        tais que \(s_A = 2 \; s_B\).
+        Tentando achar sem essa restrição:
+        \begin{align*}
+            s_A &= 2 \; s_B \\
+            p_A \; (1 - p_B) &= 2 \; p_B \; (1 - p_A) \\
+            p_A - p_A \; p_B &= 2 \; p_B - 2 \; p_A \; p_B \\
+            p_A + p_A \; p_B &= 2 \; p_B \\
+        \end{align*}
+    \item
+        No caso genérico,
+        com um total de \(N\) nós,
+        a probabilidade de \(A\) transmitir sem colisão é
+        \(s_A := 2 \; p \; (1 - p)\),
+        similamente,
+        a probabilidade de outro nó transmitir sem colisão é
+        \(s_O := p \; (1 - 2 \; p)\).
+        Dessa forma,
+        o throughput de \(A\) é \(s_A\) pacotes por slot e
+        o throughput de qualquer outro nó é \(s_O\) pacotes por slot.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{11}
+    A probabilidade de algum nó
+    realizar uma transmissão com sucesso é
+    \(s := p \; (1 - p)^3\).
+    \begin{exe-list}
+    \item
+        Como \(A\) deve ``falhar'' 4 vezes
+        e ``dar certo'' na slot 5,
+        a probabilidade é \(s \; (1 - s)^4\).
+    \item
+        Como ``ser no slot 4'',
+        não faz diferênça,
+        a probabilidade é a soma
+        das probabilidades de cada um ``dar certo'',
+        ou seja, \(4 \; s\).
+    \item
+        A probabilidade dos 4 nós ``falharem'' é
+        \(4 \; (1 - s)\),
+        então isso deve acontecer 2 vezes,
+        seguido de um sucesso (o complementar disso),
+        ou seja, \(4 \; (1 - s) \; (1 - 4 \; (1 - s))\).
+    \item
+        A eficiência é igual a probabilidade de ter algum sucesso,
+        ou seja, \(4 \; s\).
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{12}
+    Usando a eficiencia do slotted ALOHA
+    \(f_N(p) := N \; p \; (1 - p)^{N-1}\)
+    de vermelho,
+    e do pure ALOHA
+    \(g_N(p) := N \; p \; (1 - p)^{2(N-1)}\)
+    de azul.
+    \begin{exe-list}
+    \item \(N = 15\) \par
+        \begin{center}\begin{tikzpicture}
+            \begin{axis}[xmin=-0.05,xmax=1.05,ymin=-0.05,ymax=0.4,
+                    xlabel=\(p\), ylabel=Eficiência,
+                ]
+                \addlegendentry{\(f_{15}(p)\)}
+                \addplot[domain=0:1, color=red, smooth, thick, samples=100]
+                    { 15 * x * (1-x)^(14) };
+                \addlegendentry{\(g_{15}(p)\)}
+                \addplot[domain=0:1, color=blue, smooth, thick, samples=100]
+                 { 15 * x * (1-x)^(29) };
+            \end{axis}
+        \end{tikzpicture}\end{center}
+    \item \(N = 25\) \par
+        \begin{center}\begin{tikzpicture}
+            \begin{axis}[xmin=-0.05,xmax=1.05,ymin=-0.05,ymax=0.4,
+                    xlabel=\(p\), ylabel=Eficiência,
+                ]
+                \addlegendentry{\(f_{25}(p)\)}
+                \addplot[domain=0:1, color=red, smooth, thick, samples=100]
+                    { 25 * x * (1-x)^(24) };
+                \addlegendentry{\(g_{25}(p)\)}
+                \addplot[domain=0:1, color=blue, smooth, thick, samples=100]
+                 { 25 * x * (1-x)^(49) };
+            \end{axis}
+        \end{tikzpicture}\end{center}
+    \item \(N = 35\) \par
+        \begin{center}\begin{tikzpicture}
+            \begin{axis}[xmin=-0.05,xmax=1.05,ymin=-0.05,ymax=0.4,
+                    xlabel=\(p\), ylabel=Eficiência,
+                ]
+                \addlegendentry{\(f_{35}(p)\)}
+                \addplot[domain=0:1, color=red, smooth, thick, samples=100]
+                    { 35 * x * (1-x)^(34) };
+                \addlegendentry{\(g_{35}(p)\)}
+                \addplot[domain=0:1, color=blue, smooth, thick, samples=100]
+                 { 35 * x * (1-x)^(59) };
+            \end{axis}
+        \end{tikzpicture}\end{center}
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{15}
+    \begin{exe-list}
+    \item
+        Não, Host E tem um ``caminho direto'' para Host F e
+        estão na mesma rede.
+        Source IP: IP-E, Source MAC: MAC-E,
+        Target IP: IP-F, Target MAC: MAC-F.
+    \item
+        Não, Host B não está na mesma rede que Host E,
+        vai mandar o datagram para o Router R1.
+        Source IP: IP-E, Source MAC: MAC-E,
+        Target IP: IP-B, Target MAC: MAC-R1.
+    \item
+        Switch S1 vai repassar o request de ARP para
+        todos as outras máquinas (B, C, D, R1),
+        pois é um broadcast.
+        Router R1 vai receber o request,
+        mas não vai repassar para a rede 3.
+        Quando Host B receber o request,
+        ele já sabe o MAC do Host A,
+        pois ele está escrito no request.
+        O switch S1 vai repassar apenas para o Host A,
+        o request ARP tinha o MAC do Host A,
+        então o switch S1 já ``aprendeu''
+        qual interface tem que usar para chegar ao Host A.
+    \end{exe-list}
+\end{exe}
+
+\begin{exe}{20}
+    \begin{exe-list}
+    \item
+        A probabilidade de um nó começar uma transmissão,
+        dado que o sistema está no estado improdutivo, é
+        \(s = p \; (1-p)^{N-1}\).
+        Em um ciclo, vamos ter um período produtivo de \(k\) slots
+        e um improdutivo de, na média,
+        esperança do tempo que demora para ocorrer
+        o primeiro início de transmissão,
+        ou seja, a esperança da geométrica de \(N \; s\).
+        Assim, o tamanho do ciclo é
+        \(k + \frac{1}{N \; s}\) e
+        a eficiência é
+        \[
+            \frac{k}{k + \frac{1}{N \; s}}
+            = \frac{k}{k + \frac{1}{N \; p \; (1-p)^{N-1}}}
+        \]
+    \item
+        Simplificando \(h_N(p)\):
+        \begin{align*}
+            h_N(p)
+            &= \frac{k}{k + \frac{1}{N \; p \; (1-p)^{N-1}}} \\
+            &= \frac{k}{\frac{k \; N \; p \; (1-p)^{N-1} + 1}{N \; p \; (1-p)^{N-1}}} \\
+            &= \frac{k \; N \; p \; (1-p)^{N-1}}{k \; N \; p \; (1-p)^{N-1} + 1} \\
+        \end{align*}
+        Derivando \(h_N(p)\) em relação a \(p\):
+        \begin{align*}
+            \frac{d \; h_N(p)}{dp}
+            &= \frac{d \;}{dp} \left( \frac{k \; N \; p \; (1-p)^{N-1}}{k \; N \; p \; (1-p)^{N-1} + 1} \right) \\
+            &= \frac{d \;}{dp} \left( \frac{f(p)}{f(p) + 1} \right) \\
+            &= \frac{d \;}{dp} \left( f(p) \; \frac{1}{f(p) + 1} \right) \\
+            &= f(p) \; \frac{d \;}{dp} \left( \frac{1}{f(p) + 1} \right)
+                + \frac{d \; f(p)}{dp} \; \frac{1}{f(p) + 1} \\
+            &= f(p) \; \left( \frac{-1}{(f(p) + 1)^2} \; f'(p) \right)
+                + f'(p) \; \frac{1}{f(p) + 1} \\
+            &= \frac{- f(p) \; f'(p)}{(f(p) + 1)^2} + \frac{f'(p)}{f(p) + 1} \\
+            &= \frac{(f(p) + 1) \; f'(p) - f(p) \; f'(p)}{(f(p) + 1)^2} \\
+            &= \frac{f(p) \; f'(p) + f'(p) - f(p) \; f'(p)}{(f(p) + 1)^2} \\
+            &= \frac{f'(p)}{(f(p) + 1)^2} \\
+            &= \frac{k \; N \; (1-p)^{N-1} - k \; N \; (N-1) \; p \; (1-p)^{N-2}}{(k \; N \; p \; (1-p)^{N-1} + 1)^2} \\
+            &= \frac{k \; N \; (1-p)^{N-2} ((1-p) - (N-1) \; p)}{(k \; N \; p \; (1-p)^{N-1} + 1)^2} \\
+            &= \frac{k \; N \; (1-p)^{N-2} (1 - p - N \; p + p)}{(k \; N \; p \; (1-p)^{N-1} + 1)^2} \\
+            &= \frac{k \; N \; (1-p)^{N-2} (1 - N \; p)}{(k \; N \; p \; (1-p)^{N-1} + 1)^2} \\
+        \end{align*}
+        As raízes são \(\left\{ \frac1N, 1 \right\}\).
+        \begin{align*}
+            h_N(0)
+                &= \frac{k \; N \cdot 0 \; (1-0)^{N-1}}{k \; N \cdot 0 \cdot (1-0)^{N-1} + 1} \\\\
+                &= \frac{0}{1} \\
+                &= 0 \\\\
+            h_N\left(\frac1N\right)
+                &= \frac{k \; N \; \frac1N \; (1-\frac1N)^{N-1}}{k \; N \; \frac1N \; (1-\frac1N)^{N-1} + 1} \\
+                &= \frac{k \; (1-\frac1N)^{N-1}}{k \; (1-\frac1N)^{N-1} + 1} \\\\
+            h_N(1)
+                &= \frac{k \; N \cdot 1 \cdot (1-1)^{N-1}}{k \; N \cdot 1 \cdot (1-1)^{N-1} + 1} \\
+                &= \frac{0}{1} \\
+                &= 0
+        \end{align*}
+        Então, \(p^* = \frac1N\).
+    \item
+        Foi respondida no item anterior,
+        com \(p^* = \frac1N\):
+        \[
+            h_N(p^*) =
+            \frac{k \; (1-\frac1N)^{N-1}}{k \; (1-\frac1N)^{N-1} + 1}
+        \]
+    \item
+        Para que a razão se aproxime a \(1\),
+        \(k \; (\frac{N-1}{N})^{N-1}\) tem que muito grande.
+        Com \(N\) muito grande, isso se aproxima a
+        \(k \; \frac1e\),
+        que não é ``tão grande''.
+        Mas com \(k\) muito grande, isso se aproxima
+        a um valor muito grande.
+        Com \(k\) muito grande,
+        o tamanho do frame \(L = k \; N \; S\)
+        também fica muito grande.
+    \end{exe-list}
+\end{exe}
+
+\end{document}
